@@ -1,3 +1,4 @@
 # Ignore project files
 *.iml
 .idea
+.vscode
