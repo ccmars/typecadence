@@ -67,11 +67,34 @@ class Typecadence {
     return caretAttribute === "true";
   }
 
+  #parseMistakes(mistakesAttribute: string | null): number {
+    const mistakes = parseInt(mistakesAttribute || '');
+    return isNaN(mistakes) || mistakes < 0 || mistakes > 100 ? 0 : mistakes;
+  }
+
+  #isMistake(chance: number): boolean {
+    return Math.random() * 100 < chance;
+  }
+
+  async #backspace(element: HTMLElement, caret: HTMLElement | null, minSpeed: number, maxSpeed: number): Promise<void> {
+    if (caret) {
+      element.removeChild(element.lastChild!.previousSibling!);
+    } else {
+      element.textContent = element.textContent!.slice(0, -1);
+    }
+    await new Promise(resolve => setTimeout(resolve, this.#getTypingSpeed(minSpeed, maxSpeed)));
+  }
+
   async animateText(element: HTMLElement): Promise<void> {
     const text = element.textContent?.trim() || '';
     const delay = this.#parseDelay(element.getAttribute("data-typecadence-delay"));
     const [minSpeed, maxSpeed] = this.#parseSpeedAttribute(element.getAttribute("data-typecadence-speed"));
     const displayCaret = this.#shouldDisplayCaret(element);
+    const mistakeChance = this.#parseMistakes(element.getAttribute("data-typecadence-mistakes"));
+    const caretBlinkSpeed = parseInt(element.getAttribute("data-typecadence-caret-blink-speed") || '') || 500;
+    const caretBlink = element.getAttribute("data-typecadence-caret-blink") !== "false";
+    const caretRemain = element.getAttribute("data-typecadence-caret-remain") === "true";
+    const caretRemainTimeout = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout") || '');
     element.textContent = "";
 
     let caret: HTMLElement | null = null;
@@ -81,19 +104,33 @@ class Typecadence {
       caret = this.#createCaret(element);
       element.appendChild(caret);
 
-      caretAnimationInterval = setInterval(() => {
-        if (caret.style.visibility === "visible") {
-          caret.style.visibility = "hidden";
-        } else {
-          caret.style.visibility = "visible";
-        }
-      }, 500);
+      if (caretBlink) {
+        caretAnimationInterval = setInterval(() => {
+          if (caret.style.visibility === "visible") {
+            caret.style.visibility = "hidden";
+          } else {
+            caret.style.visibility = "visible";
+          }
+        }, caretBlinkSpeed);
+      }
     }
 
     let currentIndex = 0;
     await new Promise(resolve => setTimeout(resolve, delay));
 
     for (const char of text) {
+      if (this.#isMistake(mistakeChance)) {
+        const incorrectChar = String.fromCharCode(Math.floor(Math.random() * 94) + 33);
+        const charNode = document.createTextNode(incorrectChar);
+        if (caret) {
+          element.insertBefore(charNode, caret);
+        } else {
+          element.appendChild(charNode);
+        }
+        await new Promise(resolve => setTimeout(resolve, this.#getTypingSpeed(minSpeed, maxSpeed)));
+        await this.#backspace(element, caret, minSpeed, maxSpeed);
+      }
+
       const charNode = document.createTextNode(char);
       if (caret) {
         element.insertBefore(charNode, caret);
@@ -105,10 +142,21 @@ class Typecadence {
       await new Promise(resolve => setTimeout(resolve, typingSpeed));
     }
 
-    if (caretAnimationInterval) {
+    if (caretAnimationInterval && caretRemain) {
+      if (!isNaN(caretRemainTimeout)) {
+        setTimeout(() => {
+          clearInterval(caretAnimationInterval);
+          if (caret) {
+            caret.style.visibility = "hidden";
+          }
+        }, caretRemainTimeout);
+      }
+    } else if (caretAnimationInterval) {
       clearInterval(caretAnimationInterval);
+      if (caret) {
+        caret.style.visibility = "hidden";
+      }
     }
-    caret?.remove();
   }
 }
 

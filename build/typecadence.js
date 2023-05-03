@@ -18,7 +18,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Typecadence_instances, _Typecadence_elements, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseDelay, _Typecadence_parseSpeedAttribute, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_shouldDisplayCaret;
+var _Typecadence_instances, _Typecadence_elements, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseDelay, _Typecadence_parseSpeedAttribute, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_shouldDisplayCaret, _Typecadence_parseMistakes, _Typecadence_isMistake, _Typecadence_backspace;
 class Typecadence {
     constructor() {
         _Typecadence_instances.add(this);
@@ -44,24 +44,43 @@ class Typecadence {
             const delay = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseDelay).call(this, element.getAttribute("data-typecadence-delay"));
             const [minSpeed, maxSpeed] = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseSpeedAttribute).call(this, element.getAttribute("data-typecadence-speed"));
             const displayCaret = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_shouldDisplayCaret).call(this, element);
+            const mistakeChance = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseMistakes).call(this, element.getAttribute("data-typecadence-mistakes"));
+            const caretBlinkSpeed = parseInt(element.getAttribute("data-typecadence-caret-blink-speed") || '') || 500;
+            const caretBlink = element.getAttribute("data-typecadence-caret-blink") !== "false";
+            const caretRemain = element.getAttribute("data-typecadence-caret-remain") === "true";
+            const caretRemainTimeout = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout") || '');
             element.textContent = "";
             let caret = null;
             let caretAnimationInterval = null;
             if (displayCaret) {
                 caret = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_createCaret).call(this, element);
                 element.appendChild(caret);
-                caretAnimationInterval = setInterval(() => {
-                    if (caret.style.visibility === "visible") {
-                        caret.style.visibility = "hidden";
-                    }
-                    else {
-                        caret.style.visibility = "visible";
-                    }
-                }, 500);
+                if (caretBlink) {
+                    caretAnimationInterval = setInterval(() => {
+                        if (caret.style.visibility === "visible") {
+                            caret.style.visibility = "hidden";
+                        }
+                        else {
+                            caret.style.visibility = "visible";
+                        }
+                    }, caretBlinkSpeed);
+                }
             }
             let currentIndex = 0;
             yield new Promise(resolve => setTimeout(resolve, delay));
             for (const char of text) {
+                if (__classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, mistakeChance)) {
+                    const incorrectChar = String.fromCharCode(Math.floor(Math.random() * 94) + 33);
+                    const charNode = document.createTextNode(incorrectChar);
+                    if (caret) {
+                        element.insertBefore(charNode, caret);
+                    }
+                    else {
+                        element.appendChild(charNode);
+                    }
+                    yield new Promise(resolve => setTimeout(resolve, __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, minSpeed, maxSpeed)));
+                    yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, minSpeed, maxSpeed);
+                }
                 const charNode = document.createTextNode(char);
                 if (caret) {
                     element.insertBefore(charNode, caret);
@@ -73,10 +92,22 @@ class Typecadence {
                 const typingSpeed = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, minSpeed, maxSpeed);
                 yield new Promise(resolve => setTimeout(resolve, typingSpeed));
             }
-            if (caretAnimationInterval) {
-                clearInterval(caretAnimationInterval);
+            if (caretAnimationInterval && caretRemain) {
+                if (!isNaN(caretRemainTimeout)) {
+                    setTimeout(() => {
+                        clearInterval(caretAnimationInterval);
+                        if (caret) {
+                            caret.style.visibility = "hidden";
+                        }
+                    }, caretRemainTimeout);
+                }
             }
-            caret === null || caret === void 0 ? void 0 : caret.remove();
+            else if (caretAnimationInterval) {
+                clearInterval(caretAnimationInterval);
+                if (caret) {
+                    caret.style.visibility = "hidden";
+                }
+            }
         });
     }
 }
@@ -115,6 +146,21 @@ _Typecadence_elements = new WeakMap(), _Typecadence_observer = new WeakMap(), _T
 }, _Typecadence_shouldDisplayCaret = function _Typecadence_shouldDisplayCaret(element) {
     const caretAttribute = element.getAttribute("data-typecadence-caret");
     return caretAttribute === "true";
+}, _Typecadence_parseMistakes = function _Typecadence_parseMistakes(mistakesAttribute) {
+    const mistakes = parseInt(mistakesAttribute || '');
+    return isNaN(mistakes) || mistakes < 0 || mistakes > 100 ? 0 : mistakes;
+}, _Typecadence_isMistake = function _Typecadence_isMistake(chance) {
+    return Math.random() * 100 < chance;
+}, _Typecadence_backspace = function _Typecadence_backspace(element, caret, minSpeed, maxSpeed) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (caret) {
+            element.removeChild(element.lastChild.previousSibling);
+        }
+        else {
+            element.textContent = element.textContent.slice(0, -1);
+        }
+        yield new Promise(resolve => setTimeout(resolve, __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, minSpeed, maxSpeed)));
+    });
 };
 document.addEventListener("DOMContentLoaded", () => {
     new Typecadence();
