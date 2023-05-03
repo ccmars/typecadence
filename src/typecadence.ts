@@ -1,7 +1,6 @@
 class Typecadence {
-  #elements: NodeListOf<HTMLElement>;
+  readonly #elements: NodeListOf<HTMLElement>;
   #observer: IntersectionObserver;
-  #caretClassName: string;
 
   constructor() {
     this.#elements = document.querySelectorAll(".typecadence");
@@ -10,7 +9,6 @@ class Typecadence {
       rootMargin: "0px",
       threshold: 0.1
     });
-    this.#caretClassName = "typecadence-caret";
     this.init();
   }
 
@@ -47,10 +45,20 @@ class Typecadence {
     return Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
   }
 
-  #createCaret(): HTMLElement {
+  #createCaret(element: HTMLElement): HTMLElement {
     const caret = document.createElement("span");
-    caret.classList.add(this.#caretClassName);
-    caret.textContent = "|";
+    caret.classList.add("typecadence-caret");
+    caret.textContent = element.getAttribute("data-typecadence-caret-char") || '|';
+
+    const caretColor = element.getAttribute("data-typecadence-caret-color");
+    if (caretColor) {
+      caret.style.color = caretColor;
+    }
+
+    const caretBold = element.getAttribute("data-typecadence-caret-bold");
+    caret.style.fontWeight = caretBold === "false" ? "normal" : "bold";
+
+    caret.style.visibility = "visible";
     return caret;
   }
 
@@ -70,11 +78,15 @@ class Typecadence {
     let caretAnimationInterval: number | null = null;
 
     if (displayCaret) {
-      caret = this.#createCaret();
+      caret = this.#createCaret(element);
       element.appendChild(caret);
 
       caretAnimationInterval = setInterval(() => {
-        caret?.classList.toggle("hidden");
+        if (caret.style.visibility === "visible") {
+          caret.style.visibility = "hidden";
+        } else {
+          caret.style.visibility = "visible";
+        }
       }, 500);
     }
 
