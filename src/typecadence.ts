@@ -14,6 +14,57 @@ class Typecadence {
     caretRemainTimeout: null,
     mistakes: 0,
   };
+  readonly #adjacentMapping = {
+    qwerty: {
+      '`': ['1', '2', 'q', 'w'],
+      '1': ['2', 'q'],
+      '2': ['1', 'q', 'w', '3'],
+      '3': ['2', 'w', 'e', '4'],
+      '4': ['3', 'e', 'r', '5'],
+      '5': ['4', 'r', 't', '6'],
+      '6': ['5', 't', 'y', '7'],
+      '7': ['6', 'y', 'u', '8'],
+      '8': ['7', 'u', 'i', '9'],
+      '9': ['8', 'i', 'o', '0'],
+      '0': ['9', 'o', 'p', '-'],
+      '-': ['0', 'p', '[', '='],
+      '=': ['-', '[', ']'],
+      'q': ['1', '2', 'w', 'a'],
+      'w': ['q', 'a', 's', 'e', '3', '2'],
+      'e': ['w', 's', 'd', 'r', '4', '3'],
+      'r': ['e', 'd', 'f', 't', '5', '4'],
+      't': ['r', 'f', 'g', 'y', '6', '5'],
+      'y': ['t', 'g', 'h', 'u', '7', '6'],
+      'u': ['y', 'h', 'j', 'i', '8', '7'],
+      'i': ['u', 'j', 'k', 'o', '9', '8'],
+      'o': ['i', 'k', 'l', 'p', '0', '9'],
+      'p': ['o', 'l', ';', '[', '-', '0'],
+      '[': ['p', ';', '\'', ']', '=', '-'],
+      ']': ['[', '\'', '\\', '='],
+      'a': ['q', 'w', 's', 'z'],
+      's': ['a', 'z', 'x', 'd', 'e', 'w'],
+      'd': ['s', 'x', 'c', 'f', 'r', 'e'],
+      'f': ['d', 'c', 'v', 'g', 't', 'r'],
+      'g': ['f', 'v', 'b', 'h', 'y', 't'],
+      'h': ['g', 'b', 'n', 'j', 'u', 'y'],
+      'j': ['h', 'n', 'm', 'k', 'i', 'u'],
+      'k': ['j', 'm', ',', 'l', 'o', 'i'],
+      'l': ['k', ',', '.', ';', 'p', 'o'],
+      ';': ['l', '.', '/', '\'', '[', 'p'],
+      '\'': [';', '/', ']', '['],
+      'z': ['a', 's', 'x'],
+      'x': ['z', 's', 'c', 'd'],
+      'c': ['x', 'd', 'f', 'v'],
+      'v': ['c', 'f', 'g', 'b'],
+      'b': ['v', 'g', 'h', 'n'],
+      'n': ['b', 'h', 'j', 'm'],
+      'm': ['n', 'j', 'k', ','],
+      ',': ['m', 'k', 'l', '.'],
+      '.': [',', 'l', ';', '/'],
+      '/': ['.', ';', '\''],
+      '\\': [']', '[', '\''],
+    }
+  };
   #observer: IntersectionObserver;
 
   constructor() {
@@ -80,11 +131,17 @@ class Typecadence {
   }
 
   #incorrectChar(desiredChar: string): string {
-    let randomChar = String.fromCharCode(Math.floor(Math.random() * 94) + 33);
-    while (randomChar === desiredChar) {
-      randomChar = String.fromCharCode(Math.floor(Math.random() * 94) + 33);
+    const desiredCharLower = desiredChar.toLowerCase();
+    const adjacentChars = this.#adjacentMapping.qwerty[desiredCharLower];
+
+    if (!adjacentChars) {
+      return desiredChar;
     }
-    return randomChar;
+
+    const randomIndex = Math.floor(Math.random() * adjacentChars.length);
+    const incorrectChar = adjacentChars[randomIndex];
+
+    return desiredChar === desiredChar.toUpperCase() ? incorrectChar.toUpperCase() : incorrectChar;
   }
 
   async #backspace(element: HTMLElement, caret: HTMLElement | null, minSpeed: number, maxSpeed: number): Promise<void> {

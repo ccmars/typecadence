@@ -18,7 +18,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Typecadence_instances, _Typecadence_elements, _Typecadence_defaultSettings, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseSpeedAttribute, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_parseMistakes, _Typecadence_isMistake, _Typecadence_incorrectChar, _Typecadence_backspace;
+var _Typecadence_instances, _Typecadence_elements, _Typecadence_defaultSettings, _Typecadence_adjacentMapping, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseSpeedAttribute, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_parseMistakes, _Typecadence_isMistake, _Typecadence_incorrectChar, _Typecadence_backspace;
 class Typecadence {
     constructor() {
         _Typecadence_instances.add(this);
@@ -36,6 +36,57 @@ class Typecadence {
             caretRemain: false,
             caretRemainTimeout: null,
             mistakes: 0,
+        });
+        _Typecadence_adjacentMapping.set(this, {
+            qwerty: {
+                '`': ['1', '2', 'q', 'w'],
+                '1': ['2', 'q'],
+                '2': ['1', 'q', 'w', '3'],
+                '3': ['2', 'w', 'e', '4'],
+                '4': ['3', 'e', 'r', '5'],
+                '5': ['4', 'r', 't', '6'],
+                '6': ['5', 't', 'y', '7'],
+                '7': ['6', 'y', 'u', '8'],
+                '8': ['7', 'u', 'i', '9'],
+                '9': ['8', 'i', 'o', '0'],
+                '0': ['9', 'o', 'p', '-'],
+                '-': ['0', 'p', '[', '='],
+                '=': ['-', '[', ']'],
+                'q': ['1', '2', 'w', 'a'],
+                'w': ['q', 'a', 's', 'e', '3', '2'],
+                'e': ['w', 's', 'd', 'r', '4', '3'],
+                'r': ['e', 'd', 'f', 't', '5', '4'],
+                't': ['r', 'f', 'g', 'y', '6', '5'],
+                'y': ['t', 'g', 'h', 'u', '7', '6'],
+                'u': ['y', 'h', 'j', 'i', '8', '7'],
+                'i': ['u', 'j', 'k', 'o', '9', '8'],
+                'o': ['i', 'k', 'l', 'p', '0', '9'],
+                'p': ['o', 'l', ';', '[', '-', '0'],
+                '[': ['p', ';', '\'', ']', '=', '-'],
+                ']': ['[', '\'', '\\', '='],
+                'a': ['q', 'w', 's', 'z'],
+                's': ['a', 'z', 'x', 'd', 'e', 'w'],
+                'd': ['s', 'x', 'c', 'f', 'r', 'e'],
+                'f': ['d', 'c', 'v', 'g', 't', 'r'],
+                'g': ['f', 'v', 'b', 'h', 'y', 't'],
+                'h': ['g', 'b', 'n', 'j', 'u', 'y'],
+                'j': ['h', 'n', 'm', 'k', 'i', 'u'],
+                'k': ['j', 'm', ',', 'l', 'o', 'i'],
+                'l': ['k', ',', '.', ';', 'p', 'o'],
+                ';': ['l', '.', '/', '\'', '[', 'p'],
+                '\'': [';', '/', ']', '['],
+                'z': ['a', 's', 'x'],
+                'x': ['z', 's', 'c', 'd'],
+                'c': ['x', 'd', 'f', 'v'],
+                'v': ['c', 'f', 'g', 'b'],
+                'b': ['v', 'g', 'h', 'n'],
+                'n': ['b', 'h', 'j', 'm'],
+                'm': ['n', 'j', 'k', ','],
+                ',': ['m', 'k', 'l', '.'],
+                '.': [',', 'l', ';', '/'],
+                '/': ['.', ';', '\''],
+                '\\': [']', '[', '\''],
+            }
         });
         _Typecadence_observer.set(this, void 0);
         __classPrivateFieldSet(this, _Typecadence_elements, document.querySelectorAll(".typecadence"), "f");
@@ -124,7 +175,7 @@ class Typecadence {
         });
     }
 }
-_Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMap(), _Typecadence_observer = new WeakMap(), _Typecadence_instances = new WeakSet(), _Typecadence_handleIntersect = function _Typecadence_handleIntersect(entries) {
+_Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMap(), _Typecadence_adjacentMapping = new WeakMap(), _Typecadence_observer = new WeakMap(), _Typecadence_instances = new WeakSet(), _Typecadence_handleIntersect = function _Typecadence_handleIntersect(entries) {
     for (const entry of entries) {
         if (entry.isIntersecting) {
             this.animateText(entry.target);
@@ -158,11 +209,14 @@ _Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMa
 }, _Typecadence_isMistake = function _Typecadence_isMistake(chance) {
     return Math.random() * 100 < chance;
 }, _Typecadence_incorrectChar = function _Typecadence_incorrectChar(desiredChar) {
-    let randomChar = String.fromCharCode(Math.floor(Math.random() * 94) + 33);
-    while (randomChar === desiredChar) {
-        randomChar = String.fromCharCode(Math.floor(Math.random() * 94) + 33);
+    const desiredCharLower = desiredChar.toLowerCase();
+    const adjacentChars = __classPrivateFieldGet(this, _Typecadence_adjacentMapping, "f").qwerty[desiredCharLower];
+    if (!adjacentChars) {
+        return desiredChar;
     }
-    return randomChar;
+    const randomIndex = Math.floor(Math.random() * adjacentChars.length);
+    const incorrectChar = adjacentChars[randomIndex];
+    return desiredChar === desiredChar.toUpperCase() ? incorrectChar.toUpperCase() : incorrectChar;
 }, _Typecadence_backspace = function _Typecadence_backspace(element, caret, minSpeed, maxSpeed) {
     return __awaiter(this, void 0, void 0, function* () {
         if (caret) {
