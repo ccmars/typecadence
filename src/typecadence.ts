@@ -1,5 +1,19 @@
 class Typecadence {
   readonly #elements: NodeListOf<HTMLElement>;
+  readonly #defaultSettings = {
+    delay: 0,
+    minSpeed: 100,
+    maxSpeed: 100,
+    caret: true,
+    caretChar: '|',
+    caretColor: '',
+    caretBold: true,
+    caretBlink: true,
+    caretBlinkSpeed: 500,
+    caretRemain: false,
+    caretRemainTimeout: null,
+    mistakes: 0,
+  };
   #observer: IntersectionObserver;
 
   constructor() {
@@ -7,7 +21,7 @@ class Typecadence {
     this.#observer = new IntersectionObserver(this.#handleIntersect.bind(this), {
       root: null,
       rootMargin: "0px",
-      threshold: 0.1
+      threshold: 0.1,
     });
     this.init();
   }
@@ -27,16 +41,11 @@ class Typecadence {
     }
   }
 
-  #parseDelay(delayAttribute: string | null): number {
-    const delay = parseInt(delayAttribute || '');
-    return isNaN(delay) ? 0 : delay;
-  }
-
   #parseSpeedAttribute(speedAttribute: string | null): [number, number] {
-    const regex = /^\d+(?:,\d+)?$/;
-    if (!speedAttribute || !regex.test(speedAttribute)) return [100, 100];
+    const regex = /^\d+(?:[,-]\d+)?$/;
+    if (!speedAttribute || !regex.test(speedAttribute)) return [this.#defaultSettings.minSpeed, this.#defaultSettings.maxSpeed];
 
-    const speedValues = speedAttribute.split(",").map(Number);
+    const speedValues = speedAttribute.split(/,|-/).map(Number);
     if (speedValues.length === 1) return [speedValues[0], speedValues[0]];
     return [speedValues[0], speedValues[1]];
   }
@@ -48,23 +57,17 @@ class Typecadence {
   #createCaret(element: HTMLElement): HTMLElement {
     const caret = document.createElement("span");
     caret.classList.add("typecadence-caret");
-    caret.textContent = element.getAttribute("data-typecadence-caret-char") || '|';
+    caret.textContent = element.getAttribute("data-typecadence-caret-char") || this.#defaultSettings.caretChar;
 
-    const caretColor = element.getAttribute("data-typecadence-caret-color");
+    const caretColor = element.getAttribute("data-typecadence-caret-color") || this.#defaultSettings.caretColor;
     if (caretColor) {
       caret.style.color = caretColor;
     }
 
-    const caretBold = element.getAttribute("data-typecadence-caret-bold");
-    caret.style.fontWeight = caretBold === "false" ? "normal" : "bold";
+    caret.style.fontWeight = element.getAttribute("data-typecadence-caret-bold") === "false" ? "normal" : (this.#defaultSettings.caretBold ? "bold" : "normal");
 
     caret.style.visibility = "visible";
     return caret;
-  }
-
-  #shouldDisplayCaret(element: HTMLElement): boolean {
-    const caretAttribute = element.getAttribute("data-typecadence-caret");
-    return caretAttribute === "true";
   }
 
   #parseMistakes(mistakesAttribute: string | null): number {
@@ -74,6 +77,14 @@ class Typecadence {
 
   #isMistake(chance: number): boolean {
     return Math.random() * 100 < chance;
+  }
+
+  #incorrectChar(desiredChar: string): string {
+    let randomChar = String.fromCharCode(Math.floor(Math.random() * 94) + 33);
+    while (randomChar === desiredChar) {
+      randomChar = String.fromCharCode(Math.floor(Math.random() * 94) + 33);
+    }
+    return randomChar;
   }
 
   async #backspace(element: HTMLElement, caret: HTMLElement | null, minSpeed: number, maxSpeed: number): Promise<void> {
@@ -87,14 +98,14 @@ class Typecadence {
 
   async animateText(element: HTMLElement): Promise<void> {
     const text = element.textContent?.trim() || '';
-    const delay = this.#parseDelay(element.getAttribute("data-typecadence-delay"));
+    const delay = parseInt(element.getAttribute("data-typecadence-delay")) || this.#defaultSettings.delay;
     const [minSpeed, maxSpeed] = this.#parseSpeedAttribute(element.getAttribute("data-typecadence-speed"));
-    const displayCaret = this.#shouldDisplayCaret(element);
-    const mistakeChance = this.#parseMistakes(element.getAttribute("data-typecadence-mistakes"));
-    const caretBlinkSpeed = parseInt(element.getAttribute("data-typecadence-caret-blink-speed") || '') || 500;
-    const caretBlink = element.getAttribute("data-typecadence-caret-blink") !== "false";
-    const caretRemain = element.getAttribute("data-typecadence-caret-remain") === "true";
-    const caretRemainTimeout = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout") || '');
+    const displayCaret = element.getAttribute("data-typecadence-caret") === "true" || this.#defaultSettings.caret;
+    const mistakeChance = this.#parseMistakes(element.getAttribute("data-typecadence-mistakes")) || this.#defaultSettings.mistakes;
+    const caretBlinkSpeed = parseInt(element.getAttribute("data-typecadence-caret-blink-speed")) || this.#defaultSettings.caretBlinkSpeed;
+    const caretBlink = element.getAttribute("data-typecadence-caret-blink") !== "false" || this.#defaultSettings.caretBlink;
+    const caretRemain = element.getAttribute("data-typecadence-caret-remain") === "true" || this.#defaultSettings.caretRemain;
+    const caretRemainTimeout = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout")) || this.#defaultSettings.caretRemainTimeout;
     element.textContent = "";
 
     let caret: HTMLElement | null = null;
@@ -120,8 +131,7 @@ class Typecadence {
 
     for (const char of text) {
       if (this.#isMistake(mistakeChance)) {
-        const incorrectChar = String.fromCharCode(Math.floor(Math.random() * 94) + 33);
-        const charNode = document.createTextNode(incorrectChar);
+        const charNode = document.createTextNode(this.#incorrectChar(char));
         if (caret) {
           element.insertBefore(charNode, caret);
         } else {
