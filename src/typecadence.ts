@@ -13,6 +13,7 @@ class Typecadence {
     caretRemain: false,
     caretRemainTimeout: null,
     mistakes: 0,
+    mistakesAttentiveness: 100,
   };
   readonly #adjacentMapping = {
     qwerty: {
@@ -121,9 +122,9 @@ class Typecadence {
     return caret;
   }
 
-  #parseMistakes(mistakesAttribute: string | null): number {
-    const mistakes = parseInt(mistakesAttribute || '');
-    return isNaN(mistakes) || mistakes < 0 || mistakes > 100 ? 0 : mistakes;
+  #parsePercent(percentAttribute: string | null): number {
+    const percent = parseInt(percentAttribute || '');
+    return isNaN(percent) || percent < 0 ? 0 : (percent > 100 ? 100 : percent);
   }
 
   #isMistake(chance: number): boolean {
@@ -154,20 +155,30 @@ class Typecadence {
   }
 
   async animateText(element: HTMLElement): Promise<void> {
-    const text = element.textContent?.trim() || '';
-    const delay = parseInt(element.getAttribute("data-typecadence-delay")) || this.#defaultSettings.delay;
+    // Establish animation settings
+    const delayAttribute = parseInt(element.getAttribute("data-typecadence-delay"));
+    const delay = isNaN(delayAttribute) ? this.#defaultSettings.delay : delayAttribute;
     const [minSpeed, maxSpeed] = this.#parseSpeedAttribute(element.getAttribute("data-typecadence-speed"));
-    const displayCaret = element.getAttribute("data-typecadence-caret") === "true" || this.#defaultSettings.caret;
-    const mistakeChance = this.#parseMistakes(element.getAttribute("data-typecadence-mistakes")) || this.#defaultSettings.mistakes;
-    const caretBlinkSpeed = parseInt(element.getAttribute("data-typecadence-caret-blink-speed")) || this.#defaultSettings.caretBlinkSpeed;
-    const caretBlink = element.getAttribute("data-typecadence-caret-blink") !== "false" || this.#defaultSettings.caretBlink;
-    const caretRemain = element.getAttribute("data-typecadence-caret-remain") === "true" || this.#defaultSettings.caretRemain;
-    const caretRemainTimeout = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout")) || this.#defaultSettings.caretRemainTimeout;
+    const displayCaretAttribute = element.getAttribute("data-typecadence-caret");
+    const displayCaret = displayCaretAttribute !== null ? displayCaretAttribute === "true" : this.#defaultSettings.caretBlink;
+    const mistakeChance = this.#parsePercent(element.getAttribute("data-typecadence-mistakes")) || this.#defaultSettings.mistakes;
+    const mistakesAttentiveness = this.#parsePercent(element.getAttribute("data-typecadence-mistakes-attentiveness")) || this.#defaultSettings.mistakesAttentiveness;
+    const caretBlinkSpeedAttribute = parseInt(element.getAttribute("data-typecadence-caret-blink-speed"));
+    const caretBlinkSpeed = isNaN(caretBlinkSpeedAttribute) ? this.#defaultSettings.caretBlinkSpeed : caretBlinkSpeedAttribute;
+    const caretBlinkAttribute = element.getAttribute("data-typecadence-caret-blink");
+    const caretBlink = caretBlinkAttribute !== null ? caretBlinkAttribute === "true" : this.#defaultSettings.caretBlink;
+    const caretRemain = (element.getAttribute("data-typecadence-caret-remain") === "true") || this.#defaultSettings.caretRemain;
+    const caretRemainTimeoutAttribute = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout"));
+    const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? this.#defaultSettings.caretRemainTimeout : caretRemainTimeoutAttribute;
+
+    // Define text content
+    const text = element.textContent?.trim() || '';
     element.textContent = "";
 
     let caret: HTMLElement | null = null;
     let caretAnimationInterval: number | null = null;
 
+    // Create caret
     if (displayCaret) {
       caret = this.#createCaret(element);
       element.appendChild(caret);
@@ -183,9 +194,10 @@ class Typecadence {
       }
     }
 
-    let currentIndex = 0;
-    await new Promise(resolve => setTimeout(resolve, delay));
+    // Animation: loop through each character in the text
+    await new Promise(resolve => setTimeout(resolve, delay)); // Delay before typing
 
+    let currentIndex = 0;
     for (const char of text) {
       if (this.#isMistake(mistakeChance)) {
         const charNode = document.createTextNode(this.#incorrectChar(char));
@@ -209,19 +221,22 @@ class Typecadence {
       await new Promise(resolve => setTimeout(resolve, typingSpeed));
     }
 
-    if (caretAnimationInterval && caretRemain) {
-      if (!isNaN(caretRemainTimeout)) {
-        setTimeout(() => {
-          clearInterval(caretAnimationInterval);
-          if (caret) {
-            caret.style.visibility = "hidden";
-          }
-        }, caretRemainTimeout);
-      }
-    } else if (caretAnimationInterval) {
-      clearInterval(caretAnimationInterval);
-      if (caret) {
-        caret.style.visibility = "hidden";
+    // Animate caret
+    if (displayCaret) {
+      if (caretAnimationInterval && caretRemain) {
+        if (!isNaN(caretRemainTimeout)) {
+          setTimeout(() => {
+            clearInterval(caretAnimationInterval);
+            if (caret) {
+              caret.style.visibility = "hidden";
+            }
+          }, caretRemainTimeout);
+        }
+      } else if (caretAnimationInterval) {
+        clearInterval(caretAnimationInterval);
+        if (caret) {
+          caret.style.visibility = "hidden";
+        }
       }
     }
   }
