@@ -179,7 +179,7 @@ class Typecadence {
                         }, caretRemainTimeout);
                     }
                 }
-                else if (caretAnimationInterval) {
+                else {
                     clearInterval(caretAnimationInterval);
                     if (caret) {
                         caret.style.visibility = "hidden";
