@@ -200,7 +200,7 @@ _Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMa
     const regex = /^\d+(?:[,-]\d+)?$/;
     if (!speedAttribute || !regex.test(speedAttribute))
         return [__classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").minSpeed, __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").maxSpeed];
-    const speedValues = speedAttribute.split(/,|-/).map(Number);
+    const speedValues = speedAttribute.split(/[,-]/).map(Number);
     if (speedValues.length === 1)
         return [speedValues[0], speedValues[0]];
     return [speedValues[0], speedValues[1]];

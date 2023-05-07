@@ -97,7 +97,7 @@ class Typecadence {
     const regex = /^\d+(?:[,-]\d+)?$/;
     if (!speedAttribute || !regex.test(speedAttribute)) return [this.#defaultSettings.minSpeed, this.#defaultSettings.maxSpeed];
 
-    const speedValues = speedAttribute.split(/,|-/).map(Number);
+    const speedValues = speedAttribute.split(/[,-]/).map(Number);
     if (speedValues.length === 1) return [speedValues[0], speedValues[0]];
     return [speedValues[0], speedValues[1]];
   }
