@@ -1,6 +1,25 @@
 {
 	"name": "typecadence",
+	"description": "Typing animation library that automatically mimics the flaws a human typist",
 	"version": "0.0.1",
+	"license": "CC0-1.0",
+	"main": "build/typecadence.js",
+	"keywords": [
+		"Lightweight JavaScript library",
+		"Typing animation",
+		"Human-like typing effect",
+		"Realistic typing simulation",
+		"Easy-to-use JavaScript typing library",
+		"Human typist errors simulation",
+		"Adaptive typing animation",
+		"User-friendly typing effect library",
+		"Interactive typing animation",
+		"JavaScript typing effect with human flaws",
+		"Natural typing animation",
+		"Mimics human typing errors",
+		"Typing library with automatic flaws",
+		"JS typing effect library"
+	],
 	"dependencies": {
 	}
 }
