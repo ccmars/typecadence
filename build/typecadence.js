@@ -36,7 +36,7 @@ class Typecadence {
             caretRemain: false,
             caretRemainTimeout: null,
             mistakes: 0,
-            mistakesAttentiveness: 100,
+            mistakesPresent: 0,
         });
         _Typecadence_adjacentMapping.set(this, {
             qwerty: {
@@ -113,7 +113,8 @@ class Typecadence {
             const displayCaretAttribute = element.getAttribute("data-typecadence-caret");
             const displayCaret = displayCaretAttribute !== null ? displayCaretAttribute === "true" : __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlink;
             const mistakeChance = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parsePercent).call(this, element.getAttribute("data-typecadence-mistakes")) || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakes;
-            const mistakesAttentiveness = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parsePercent).call(this, element.getAttribute("data-typecadence-mistakes-attentiveness")) || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakesAttentiveness;
+            const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
+            const mistakesPresent = isNaN(mistakesPresentAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakesPresent : mistakesPresentAttribute;
             const caretBlinkSpeedAttribute = parseInt(element.getAttribute("data-typecadence-caret-blink-speed"));
             const caretBlinkSpeed = isNaN(caretBlinkSpeedAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlinkSpeed : caretBlinkSpeedAttribute;
             const caretBlinkAttribute = element.getAttribute("data-typecadence-caret-blink");
@@ -142,10 +143,13 @@ class Typecadence {
                 }
             }
             // Animation: loop through each character in the text
-            yield new Promise(resolve => setTimeout(resolve, delay)); // Delay before typing
+            yield new Promise((resolve) => setTimeout(resolve, delay)); // Delay before typing
+            let mistakeBuffer = [];
             let currentIndex = 0;
-            for (const char of text) {
-                if (__classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, mistakeChance)) {
+            while (currentIndex < text.length || mistakeBuffer.length > 0) {
+                const char = text[currentIndex];
+                const isMistake = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, mistakeChance);
+                if (isMistake) {
                     const charNode = document.createTextNode(__classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_incorrectChar).call(this, char));
                     if (caret) {
                         element.insertBefore(charNode, caret);
@@ -153,19 +157,32 @@ class Typecadence {
                     else {
                         element.appendChild(charNode);
                     }
-                    yield new Promise(resolve => setTimeout(resolve, __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, minSpeed, maxSpeed)));
-                    yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, minSpeed, maxSpeed);
-                }
-                const charNode = document.createTextNode(char);
-                if (caret) {
-                    element.insertBefore(charNode, caret);
+                    mistakeBuffer.push(currentIndex);
                 }
                 else {
-                    element.appendChild(charNode);
+                    const charNode = document.createTextNode(char);
+                    if (caret) {
+                        element.insertBefore(charNode, caret);
+                    }
+                    else {
+                        element.appendChild(charNode);
+                    }
                 }
                 currentIndex++;
+                // Correct mistakes
+                if (mistakeBuffer.length > 0
+                    && (mistakeBuffer[mistakeBuffer.length - 1] >= mistakesPresent
+                        || currentIndex >= text.length)) {
+                    const mistakeIndex = mistakeBuffer.pop();
+                    const stepsToGoBack = currentIndex - mistakeIndex;
+                    for (let i = 0; i < stepsToGoBack; i++) {
+                        yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, minSpeed, maxSpeed);
+                        currentIndex--;
+                    }
+                }
                 const typingSpeed = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, minSpeed, maxSpeed);
-                yield new Promise(resolve => setTimeout(resolve, typingSpeed));
+                console.log("char", char, "isMistake", isMistake, "mistakeBuffer", mistakeBuffer, "currentIndex", currentIndex);
+                yield new Promise((resolve) => setTimeout(resolve, typingSpeed));
             }
             // Animate caret
             if (displayCaret) {
