@@ -29,7 +29,7 @@ class Typecadence {
     caretRemain: false,
     caretRemainTimeout: null,
     mistakes: 0,
-    mistakesPresent: 0,
+    mistakesPresent: 1,
   };
   readonly #adjacentMapping = {
     qwerty: {
@@ -156,7 +156,7 @@ class Typecadence {
     const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? this.#defaultSettings.caretRemainTimeout : caretRemainTimeoutAttribute;
     const mistakes = this.#parsePercent(element.getAttribute("data-typecadence-mistakes")) || this.#defaultSettings.mistakes;
     const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
-    const mistakesPresent = isNaN(mistakesPresentAttribute) ? this.#defaultSettings.mistakesPresent : mistakesPresentAttribute;
+    const mistakesPresent = mistakesPresentAttribute < 1 && isNaN(mistakesPresentAttribute) ? this.#defaultSettings.mistakesPresent : Math.max(1, mistakesPresentAttribute);
 
     return {
       delay,
@@ -176,6 +176,7 @@ class Typecadence {
   }
 
   #isMistake(chance: number): boolean {
+    if (chance <= 0) return false;
     return Math.random() * 100 < chance;
   }
 
@@ -228,14 +229,17 @@ class Typecadence {
       }
     }
 
-    // Animation: loop through each character in the text
-    await new Promise((resolve) => setTimeout(resolve, animationSettings.delay)); // Delay before typing
-
+    // Delay before typing
+    await new Promise((resolve) => setTimeout(resolve, animationSettings.delay));
+    
+    // Type animation
     let mistakeBuffer: number[] = [];
     let currentIndex = 0;
+
     while (currentIndex < text.length || mistakeBuffer.length > 0) {
       const char = text[currentIndex];
       const isMistake = this.#isMistake(animationSettings.mistakes);
+
       if (isMistake) {
         const charNode = document.createTextNode(this.#incorrectChar(char));
         if (caret) {
@@ -243,7 +247,7 @@ class Typecadence {
         } else {
           element.appendChild(charNode);
         }
-        mistakeBuffer.push(currentIndex); // TODO: Doesn't seem to work
+        mistakeBuffer.push(currentIndex);
       } else {
         const charNode = document.createTextNode(char);
         if (caret) {
@@ -257,19 +261,31 @@ class Typecadence {
 
       // Correct mistakes
       if (
-        mistakeBuffer.length > 0
-        && (
-          mistakeBuffer[mistakeBuffer.length - 1] >= animationSettings.mistakesPresent
-          || currentIndex >= text.length
+        mistakeBuffer.length > animationSettings.mistakesPresent
+        || (
+          mistakeBuffer.length > 0
+          && currentIndex >= text.length
         )
       ) {
-        const mistakeIndex = mistakeBuffer.pop()!;
+        const mistakeIndex = mistakeBuffer[0];
         const stepsToGoBack = currentIndex - mistakeIndex;
+        console.log(
+          "currentIndex",
+          currentIndex,
+          "mistakeBuffer.length",
+          mistakeBuffer.length,
+          "animationSettings.mistakesPresent",
+          animationSettings.mistakesPresent,
+          "stepsToGoBack",
+          stepsToGoBack
+        );
 
         for (let i = 0; i < stepsToGoBack; i++) {
           await this.#backspace(element, caret, animationSettings.minSpeed, animationSettings.maxSpeed);
           currentIndex--;
         }
+
+        mistakeBuffer = [];
       }
 
       const typingSpeed = this.#getTypingSpeed(animationSettings.minSpeed, animationSettings.maxSpeed);
