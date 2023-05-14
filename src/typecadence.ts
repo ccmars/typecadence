@@ -232,14 +232,33 @@ class Typecadence {
     // Delay before typing
     await new Promise((resolve) => setTimeout(resolve, animationSettings.delay));
     
-    // Type animation
     let mistakeBuffer: number[] = [];
     let currentIndex = 0;
 
+    // Type animation
     while (currentIndex < text.length || mistakeBuffer.length > 0) {
+      // Correct mistakes
+      if (
+        mistakeBuffer.length >= animationSettings.mistakesPresent
+        || (
+          mistakeBuffer.length > 0
+          && currentIndex >= text.length
+        )
+      ) {
+        const mistakeIndex = mistakeBuffer[0];
+        const stepsToGoBack = currentIndex - mistakeIndex;
+
+        for (let i = 0; i < stepsToGoBack; i++) {
+          await this.#backspace(element, caret, animationSettings.minSpeed, animationSettings.maxSpeed);
+          currentIndex--;
+        }
+
+        mistakeBuffer = [];
+      }
+
+      // Type next character
       const char = text[currentIndex];
       const isMistake = this.#isMistake(animationSettings.mistakes);
-
       if (isMistake) {
         const charNode = document.createTextNode(this.#incorrectChar(char));
         if (caret) {
@@ -257,50 +276,10 @@ class Typecadence {
         }
       }
 
-      currentIndex++;
-
-      // Correct mistakes
-      if (
-        mistakeBuffer.length > animationSettings.mistakesPresent
-        || (
-          mistakeBuffer.length > 0
-          && currentIndex >= text.length
-        )
-      ) {
-        const mistakeIndex = mistakeBuffer[0];
-        const stepsToGoBack = currentIndex - mistakeIndex;
-        console.log(
-          "currentIndex",
-          currentIndex,
-          "mistakeBuffer.length",
-          mistakeBuffer.length,
-          "animationSettings.mistakesPresent",
-          animationSettings.mistakesPresent,
-          "stepsToGoBack",
-          stepsToGoBack
-        );
-
-        for (let i = 0; i < stepsToGoBack; i++) {
-          await this.#backspace(element, caret, animationSettings.minSpeed, animationSettings.maxSpeed);
-          currentIndex--;
-        }
-
-        mistakeBuffer = [];
-      }
-
       const typingSpeed = this.#getTypingSpeed(animationSettings.minSpeed, animationSettings.maxSpeed);
-      console.log(
-        "char",
-        char,
-        "isMistake",
-        isMistake,
-        "mistakeBuffer",
-        mistakeBuffer,
-        "currentIndex",
-        currentIndex
-      );
 
       await new Promise((resolve) => setTimeout(resolve, typingSpeed));
+      currentIndex++;
     }
 
     // Hide caret

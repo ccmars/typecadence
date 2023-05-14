@@ -129,10 +129,23 @@ class Typecadence {
             }
             // Delay before typing
             yield new Promise((resolve) => setTimeout(resolve, animationSettings.delay));
-            // Type animation
             let mistakeBuffer = [];
             let currentIndex = 0;
+            // Type animation
             while (currentIndex < text.length || mistakeBuffer.length > 0) {
+                // Correct mistakes
+                if (mistakeBuffer.length >= animationSettings.mistakesPresent
+                    || (mistakeBuffer.length > 0
+                        && currentIndex >= text.length)) {
+                    const mistakeIndex = mistakeBuffer[0];
+                    const stepsToGoBack = currentIndex - mistakeIndex;
+                    for (let i = 0; i < stepsToGoBack; i++) {
+                        yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, animationSettings.minSpeed, animationSettings.maxSpeed);
+                        currentIndex--;
+                    }
+                    mistakeBuffer = [];
+                }
+                // Type next character
                 const char = text[currentIndex];
                 const isMistake = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, animationSettings.mistakes);
                 if (isMistake) {
@@ -154,23 +167,9 @@ class Typecadence {
                         element.appendChild(charNode);
                     }
                 }
-                currentIndex++;
-                // Correct mistakes
-                if (mistakeBuffer.length > animationSettings.mistakesPresent
-                    || (mistakeBuffer.length > 0
-                        && currentIndex >= text.length)) {
-                    const mistakeIndex = mistakeBuffer[0];
-                    const stepsToGoBack = currentIndex - mistakeIndex;
-                    console.log("currentIndex", currentIndex, "mistakeBuffer.length", mistakeBuffer.length, "animationSettings.mistakesPresent", animationSettings.mistakesPresent, "stepsToGoBack", stepsToGoBack);
-                    for (let i = 0; i < stepsToGoBack; i++) {
-                        yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, animationSettings.minSpeed, animationSettings.maxSpeed);
-                        currentIndex--;
-                    }
-                    mistakeBuffer = [];
-                }
                 const typingSpeed = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, animationSettings.minSpeed, animationSettings.maxSpeed);
-                console.log("char", char, "isMistake", isMistake, "mistakeBuffer", mistakeBuffer, "currentIndex", currentIndex);
                 yield new Promise((resolve) => setTimeout(resolve, typingSpeed));
+                currentIndex++;
             }
             // Hide caret
             if (animationSettings.caret) {
