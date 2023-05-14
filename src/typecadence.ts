@@ -1,6 +1,22 @@
+interface AnimationSettings {
+  delay: number;
+  minSpeed: number;
+  maxSpeed: number;
+  caret: boolean;
+  caretChar: string;
+  caretColor: string;
+  caretBold: boolean;
+  caretBlinkSpeed: number;
+  caretBlink: boolean;
+  caretRemain: boolean;
+  caretRemainTimeout: number;
+  mistakes: number;
+  mistakesPresent: number;
+}
+
 class Typecadence {
   readonly #elements: NodeListOf<HTMLElement>;
-  readonly #defaultSettings = {
+  readonly #defaultSettings: AnimationSettings = {
     delay: 0,
     minSpeed: 100,
     maxSpeed: 100,
@@ -13,7 +29,7 @@ class Typecadence {
     caretRemain: false,
     caretRemainTimeout: null,
     mistakes: 0,
-    mistakesAttentiveness: 100,
+    mistakesPresent: 1,
   };
   readonly #adjacentMapping = {
     qwerty: {
@@ -106,18 +122,12 @@ class Typecadence {
     return Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
   }
 
-  #createCaret(element: HTMLElement): HTMLElement {
+  #createCaret(animationSettings: AnimationSettings): HTMLElement {
     const caret = document.createElement("span");
     caret.classList.add("typecadence-caret");
-    caret.textContent = element.getAttribute("data-typecadence-caret-char") || this.#defaultSettings.caretChar;
-
-    const caretColor = element.getAttribute("data-typecadence-caret-color") || this.#defaultSettings.caretColor;
-    if (caretColor) {
-      caret.style.color = caretColor;
-    }
-
-    caret.style.fontWeight = element.getAttribute("data-typecadence-caret-bold") === "false" ? "normal" : (this.#defaultSettings.caretBold ? "bold" : "normal");
-
+    caret.textContent = animationSettings.caretChar;
+    caret.style.color = animationSettings.caretColor;
+    caret.style.fontWeight = animationSettings.caretBold ? "bold" : "normal";
     caret.style.visibility = "visible";
     return caret;
   }
@@ -127,7 +137,46 @@ class Typecadence {
     return isNaN(percent) || percent < 0 ? 0 : (percent > 100 ? 100 : percent);
   }
 
+  #parseAnimationSettings(element: HTMLElement): AnimationSettings {
+    const delayAttribute = parseInt(element.getAttribute("data-typecadence-delay"));
+    const delay = isNaN(delayAttribute) ? this.#defaultSettings.delay : delayAttribute;
+    const [minSpeed, maxSpeed] = this.#parseSpeedAttribute(element.getAttribute("data-typecadence-speed"));
+    const displayCaretAttribute = element.getAttribute("data-typecadence-caret");
+    const caret = displayCaretAttribute !== null ? displayCaretAttribute === "true" : this.#defaultSettings.caretBlink;
+    const caretChar = element.getAttribute("data-typecadence-caret-char") || this.#defaultSettings.caretChar;
+    const caretColor = element.getAttribute("data-typecadence-caret-color") || this.#defaultSettings.caretColor;
+    const caretBoldAttribute = element.getAttribute("data-typecadence-caret-bold");
+    const caretBold = caretBoldAttribute !== null ? caretBoldAttribute === "true" : this.#defaultSettings.caretBlink;
+    const caretBlinkSpeedAttribute = parseInt(element.getAttribute("data-typecadence-caret-blink-speed"));
+    const caretBlinkSpeed = isNaN(caretBlinkSpeedAttribute) ? this.#defaultSettings.caretBlinkSpeed : caretBlinkSpeedAttribute;
+    const caretBlinkAttribute = element.getAttribute("data-typecadence-caret-blink");
+    const caretBlink = caretBlinkAttribute !== null ? caretBlinkAttribute === "true" : this.#defaultSettings.caretBlink;
+    const caretRemain = (element.getAttribute("data-typecadence-caret-remain") === "true") || this.#defaultSettings.caretRemain;
+    const caretRemainTimeoutAttribute = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout"));
+    const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? this.#defaultSettings.caretRemainTimeout : caretRemainTimeoutAttribute;
+    const mistakes = this.#parsePercent(element.getAttribute("data-typecadence-mistakes")) || this.#defaultSettings.mistakes;
+    const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
+    const mistakesPresent = mistakesPresentAttribute < 1 && isNaN(mistakesPresentAttribute) ? this.#defaultSettings.mistakesPresent : Math.max(1, mistakesPresentAttribute);
+
+    return {
+      delay,
+      minSpeed,
+      maxSpeed,
+      caret,
+      caretChar,
+      caretColor,
+      caretBold,
+      caretBlinkSpeed,
+      caretBlink,
+      caretRemain,
+      caretRemainTimeout,
+      mistakes,
+      mistakesPresent,
+    };
+  }
+
   #isMistake(chance: number): boolean {
+    if (chance <= 0) return false;
     return Math.random() * 100 < chance;
   }
 
@@ -155,21 +204,7 @@ class Typecadence {
   }
 
   async animateText(element: HTMLElement): Promise<void> {
-    // Establish animation settings
-    const delayAttribute = parseInt(element.getAttribute("data-typecadence-delay"));
-    const delay = isNaN(delayAttribute) ? this.#defaultSettings.delay : delayAttribute;
-    const [minSpeed, maxSpeed] = this.#parseSpeedAttribute(element.getAttribute("data-typecadence-speed"));
-    const displayCaretAttribute = element.getAttribute("data-typecadence-caret");
-    const displayCaret = displayCaretAttribute !== null ? displayCaretAttribute === "true" : this.#defaultSettings.caretBlink;
-    const mistakeChance = this.#parsePercent(element.getAttribute("data-typecadence-mistakes")) || this.#defaultSettings.mistakes;
-    const mistakesAttentiveness = this.#parsePercent(element.getAttribute("data-typecadence-mistakes-attentiveness")) || this.#defaultSettings.mistakesAttentiveness;
-    const caretBlinkSpeedAttribute = parseInt(element.getAttribute("data-typecadence-caret-blink-speed"));
-    const caretBlinkSpeed = isNaN(caretBlinkSpeedAttribute) ? this.#defaultSettings.caretBlinkSpeed : caretBlinkSpeedAttribute;
-    const caretBlinkAttribute = element.getAttribute("data-typecadence-caret-blink");
-    const caretBlink = caretBlinkAttribute !== null ? caretBlinkAttribute === "true" : this.#defaultSettings.caretBlink;
-    const caretRemain = (element.getAttribute("data-typecadence-caret-remain") === "true") || this.#defaultSettings.caretRemain;
-    const caretRemainTimeoutAttribute = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout"));
-    const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? this.#defaultSettings.caretRemainTimeout : caretRemainTimeoutAttribute;
+    const animationSettings = this.#parseAnimationSettings(element);
 
     // Define text content
     const text = element.textContent?.trim() || '';
@@ -178,59 +213,85 @@ class Typecadence {
     let caret: HTMLElement | null = null;
     let caretAnimationInterval: number | null = null;
 
-    // Create caret
-    if (displayCaret) {
-      caret = this.#createCaret(element);
+    // Show caret
+    if (animationSettings.caret) {
+      caret = this.#createCaret(animationSettings);
       element.appendChild(caret);
 
-      if (caretBlink) {
+      if (animationSettings.caretBlink) {
         caretAnimationInterval = setInterval(() => {
           if (caret.style.visibility === "visible") {
             caret.style.visibility = "hidden";
           } else {
             caret.style.visibility = "visible";
           }
-        }, caretBlinkSpeed);
+        }, animationSettings.caretBlinkSpeed);
       }
     }
 
-    // Animation: loop through each character in the text
-    await new Promise(resolve => setTimeout(resolve, delay)); // Delay before typing
-
+    // Delay before typing
+    await new Promise((resolve) => setTimeout(resolve, animationSettings.delay));
+    
+    let mistakeBuffer: number[] = [];
     let currentIndex = 0;
-    for (const char of text) {
-      if (this.#isMistake(mistakeChance)) {
+
+    // Type animation
+    while (currentIndex < text.length || mistakeBuffer.length > 0) {
+      // Correct mistakes
+      if (
+        mistakeBuffer.length >= animationSettings.mistakesPresent
+        || (
+          mistakeBuffer.length > 0
+          && currentIndex >= text.length
+        )
+      ) {
+        const mistakeIndex = mistakeBuffer[0];
+        const stepsToGoBack = currentIndex - mistakeIndex;
+
+        for (let i = 0; i < stepsToGoBack; i++) {
+          await this.#backspace(element, caret, animationSettings.minSpeed, animationSettings.maxSpeed);
+          currentIndex--;
+        }
+
+        mistakeBuffer = [];
+      }
+
+      // Type next character
+      const char = text[currentIndex];
+      const isMistake = this.#isMistake(animationSettings.mistakes);
+      if (isMistake) {
         const charNode = document.createTextNode(this.#incorrectChar(char));
         if (caret) {
           element.insertBefore(charNode, caret);
         } else {
           element.appendChild(charNode);
         }
-        await new Promise(resolve => setTimeout(resolve, this.#getTypingSpeed(minSpeed, maxSpeed)));
-        await this.#backspace(element, caret, minSpeed, maxSpeed);
+        mistakeBuffer.push(currentIndex);
+      } else {
+        const charNode = document.createTextNode(char);
+        if (caret) {
+          element.insertBefore(charNode, caret);
+        } else {
+          element.appendChild(charNode);
+        }
       }
 
-      const charNode = document.createTextNode(char);
-      if (caret) {
-        element.insertBefore(charNode, caret);
-      } else {
-        element.appendChild(charNode);
-      }
+      const typingSpeed = this.#getTypingSpeed(animationSettings.minSpeed, animationSettings.maxSpeed);
+
+      await new Promise((resolve) => setTimeout(resolve, typingSpeed));
       currentIndex++;
-      const typingSpeed = this.#getTypingSpeed(minSpeed, maxSpeed);
-      await new Promise(resolve => setTimeout(resolve, typingSpeed));
     }
 
-    // Animate caret
-    if (displayCaret) {
-      if (caretAnimationInterval && caretRemain) {
-        if (!isNaN(caretRemainTimeout)) {
+    // Hide caret
+    if (animationSettings.caret) {
+      if (caretAnimationInterval && animationSettings.caretRemain) {
+        if (!isNaN(animationSettings.caretRemainTimeout)) {
           setTimeout(() => {
             clearInterval(caretAnimationInterval);
             if (caret) {
               caret.style.visibility = "hidden";
             }
-          }, caretRemainTimeout);
+          }, animationSettings.caretRemainTimeout);
         }
       } else {
         clearInterval(caretAnimationInterval);
