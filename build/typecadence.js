@@ -18,7 +18,13 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Typecadence_instances, _Typecadence_elements, _Typecadence_defaultSettings, _Typecadence_adjacentMapping, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseSpeedAttribute, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_parsePercent, _Typecadence_parseAnimationSettings, _Typecadence_isMistake, _Typecadence_incorrectChar, _Typecadence_backspace;
+var _Typecadence_instances, _Typecadence_elements, _Typecadence_defaultSettings, _Typecadence_adjacentMapping, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseAnimationSettings, _Typecadence_parseSpeedAttribute, _Typecadence_parsePercent, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_isMistake, _Typecadence_incorrectChar, _Typecadence_backspace;
+var KeyboardLayout;
+(function (KeyboardLayout) {
+    KeyboardLayout["QWERTY"] = "qwerty";
+    KeyboardLayout["QWERTZ"] = "qwertz";
+    KeyboardLayout["AZERTY"] = "azerty";
+})(KeyboardLayout || (KeyboardLayout = {}));
 class Typecadence {
     constructor() {
         _Typecadence_instances.add(this);
@@ -37,6 +43,7 @@ class Typecadence {
             caretRemainTimeout: null,
             mistakes: 0,
             mistakesPresent: 1,
+            keyboard: KeyboardLayout.QWERTY,
         });
         _Typecadence_adjacentMapping.set(this, {
             qwerty: {
@@ -87,6 +94,111 @@ class Typecadence {
                 '.': [',', 'l', ';', '/'],
                 '/': ['.', ';', '\''],
                 '\\': [']', '[', '\''],
+            },
+            qwertz: {
+                '1': ['2', 'q', 'a', 'y', '0'],
+                '2': ['1', 'q', 'w', 's', 'e', '3'],
+                '3': ['2', 'w', 'e', 'd', 'r', '4'],
+                '4': ['3', 'e', 'r', 'f', 't', '5'],
+                '5': ['4', 't', 'z', 'g', 'h', '6'],
+                '6': ['5', 'z', 'u', 'h', 'j', '7'],
+                '7': ['6', 'u', 'i', 'j', 'k', '8'],
+                '8': ['7', 'i', 'o', 'k', 'l', '9'],
+                '9': ['8', 'o', 'p', 'l', 'm', 'ß'],
+                '0': ['9', 'p', 'ü', 'ß', '´'],
+                'ß': ['0', 'ü', '+', '´'],
+                'q': ['1', '2', 'w', 'a', 'y'],
+                'w': ['q', 'a', 's', 'e', 'd', '2', '3'],
+                'e': ['w', 's', 'd', 'f', 'r', '3', '4'],
+                'r': ['e', 'd', 'f', 'g', 't', '4', '5'],
+                't': ['r', 'f', 'g', 'h', 'z', '5', '6'],
+                'z': ['t', 'g', 'h', 'u', 'i', '6', '7'],
+                'u': ['z', 'h', 'j', 'k', 'o', '7', '8'],
+                'i': ['u', 'j', 'k', 'l', 'p', 'ö', 'ü', '8', '9'],
+                'o': ['i', 'k', 'l', 'ö', 'ä', 'p', '9', '0'],
+                'p': ['o', 'l', 'ö', 'ä', 'ü', '+', '0', 'ß'],
+                'a': ['q', 'w', 's', 'y'],
+                's': ['a', 'w', 'e', 'd', 'x', 'y'],
+                'd': ['s', 'e', 'r', 'f', 'c', 'x'],
+                'f': ['d', 'r', 't', 'g', 'v', 'c'],
+                'g': ['f', 't', 'z', 'h', 'b', 'v'],
+                'h': ['g', 'z', 'u', 'j', 'n', 'b'],
+                'j': ['h', 'u', 'i', 'k', 'm', 'n'],
+                'k': ['j', 'i', 'o', 'l', ',', 'm'],
+                'l': ['k', 'o', 'p', 'ö', 'ä', 'ü', 'm'],
+                'ö': ['l', 'p', 'ü', 'ä'],
+                'ä': ['ö', 'p', 'ü'],
+                'y': ['q', 'a', 's', 'x'],
+                'x': ['y', 's', 'd', 'c'],
+                'c': ['x', 'd', 'f', 'v'],
+                'v': ['c', 'f', 'g', 'b'],
+                'b': ['v', 'g', 'h', 'n'],
+                'n': ['b', 'h', 'j', 'm'],
+                'm': ['n', 'j', 'k', 'l', ','],
+                ',': ['m', 'k', 'l', ';', '.', '-'],
+                '.': [',', 'l', ';', ':', '/', '-'],
+                '-': ['.', ';', ':', '_', '+'],
+                '+': ['-', ':', 'ß', '´'],
+                '´': ['+', 'ß'],
+            },
+            azerty: {
+                '1': ['2', '&', 'a', 'z'],
+                '2': ['1', 'a', 'z', 'e', '3'],
+                '3': ['2', 'e', 'r', 'z', 'u', '4'],
+                '4': ['3', 'r', 't', 'u', 'i', 'f', '5'],
+                '5': ['4', 't', 'y', 'i', 'o', 'g', '6'],
+                '6': ['5', 'y', 'u', 'o', 'p', 'h', '7'],
+                '7': ['6', 'u', 'i', 'p', '¨', 'j', '8'],
+                '8': ['7', 'i', 'o', '¨', 'k', 'l', 'm', '9'],
+                '9': ['8', 'o', 'p', 'l', 'm', 'ù', '0'],
+                '0': ['9', 'p', 'm', 'ù', '²'],
+                'q': ['a', 'z', 'w', 's', '2'],
+                'w': ['q', 'z', 'e', 's', 'd', '3'],
+                'e': ['w', 's', 'd', 'f', 'r', '4'],
+                'r': ['e', 'd', 'f', 'g', 't', '5'],
+                't': ['r', 'f', 'g', 'h', 'y', '6'],
+                'y': ['t', 'g', 'h', 'j', 'u', '7'],
+                'u': ['y', 'h', 'j', 'k', 'i', 'z', '8'],
+                'i': ['u', 'j', 'k', 'l', 'o', 'è', '9'],
+                'o': ['i', 'k', 'l', 'm', 'p', 'à', '0'],
+                'p': ['o', 'l', 'm', 'ù', '0', '^', '$'],
+                'a': ['q', 'w', 'z', 'x'],
+                's': ['a', 'z', 'e', 'd', 'x', 'c'],
+                'd': ['s', 'e', 'r', 'f', 'c', 'v'],
+                'f': ['d', 'r', 't', 'g', 'v', 'b'],
+                'g': ['f', 't', 'y', 'h', 'b', 'n'],
+                'h': ['g', 'y', 'u', 'j', 'n', 'm'],
+                'j': ['h', 'u', 'i', 'k', 'm', ',', ';'],
+                'k': ['j', 'i', 'o', 'l', ',', 'm', '!'],
+                'l': ['k', 'o', 'p', 'm', 'ù', '²', ':'],
+                'm': ['l', 'p', 'ù', '²', '$', '*'],
+                'ù': ['m', 'p', '0', '²', '*', '%'],
+                'z': ['a', 'q', 's', 'e'],
+                'x': ['z', 's', 'd', 'c'],
+                'c': ['x', 'd', 'f', 'v'],
+                'v': ['c', 'f', 'g', 'b'],
+                'b': ['v', 'g', 'h', 'n'],
+                'n': ['b', 'h', 'j', 'm'],
+                ',': ['m', 'j', 'k', ';', ':', '!'],
+                ';': [',', 'k', 'l', 'm', ':', '*'],
+                ':': [';', 'l', 'ù', '$', '*', '%'],
+                '!': [':', 'k', 'm', 'ù', '$', '*'],
+                '$': ['ù', 'm', ',', ';', ':', '!'],
+                '^': ['p', 'ù', '*', '$'],
+                '*': ['^', 'ù', 'm', ',', ';', ':', '!'],
+                '%': ['^', 'ù', ':', '$', '*'],
+                '²': ['&', 'é', '"', '(', '-', 'è', '_', 'ç', 'à', ')', '=', '0'],
+                '&': ['1', 'a', 'z', 'é', '2', 'é', '²'],
+                'é': ['&', 'a', 'z', 'e', '"', '2', '²', '(', 'è', '3'],
+                '"': ['é', 'z', 'e', 'r', "'", '(', '²', '-', 'è', '4'],
+                '\'': ['"', 'e', 'r', 't', '(', 'è', '5', 'è'],
+                '(': ['"', 'é', 'r', 't', 'y', 'u', 'è', '_', 'ç', '6'],
+                '-': ['²', '(', 'è', 'y', 'u', 'i', 'è', 'ç', '8', '0', '=', ')'],
+                'è': ['-', 'y', 'u', 'i', 'o', 'p', '^', '$', '*', '(', '_', 'ç', 'à', ')', '=', '²'],
+                '_': ['-', '(', 'è', 'u', 'i', 'o', 'p', '^', '$', '*', 'ç', 'à', ')', '=', '0'],
+                'ç': ['²', 'è', '_', 'a', 'q', 'w', 'x', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'ù', '²', '!', ':', '*', ')', '=', 'à'],
+                'à': ['ç', '²', '(', '-', '0', ')', '=', '_'],
+                '=': ['-', '0', '²', ')', '_', 'ç', 'à'],
             }
         });
         _Typecadence_observer.set(this, void 0);
@@ -149,7 +261,7 @@ class Typecadence {
                 const char = text[currentIndex];
                 const isMistake = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, animationSettings.mistakes);
                 if (isMistake) {
-                    const charNode = document.createTextNode(__classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_incorrectChar).call(this, char));
+                    const charNode = document.createTextNode(__classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_incorrectChar).call(this, char, animationSettings.keyboard));
                     if (caret) {
                         element.insertBefore(charNode, caret);
                     }
@@ -200,47 +312,31 @@ _Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMa
             __classPrivateFieldGet(this, _Typecadence_observer, "f").unobserve(entry.target);
         }
     }
-}, _Typecadence_parseSpeedAttribute = function _Typecadence_parseSpeedAttribute(speedAttribute) {
-    const regex = /^\d+(?:[,-]\d+)?$/;
-    if (!speedAttribute || !regex.test(speedAttribute))
-        return [__classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").minSpeed, __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").maxSpeed];
-    const speedValues = speedAttribute.split(/[,-]/).map(Number);
-    if (speedValues.length === 1)
-        return [speedValues[0], speedValues[0]];
-    return [speedValues[0], speedValues[1]];
-}, _Typecadence_getTypingSpeed = function _Typecadence_getTypingSpeed(minSpeed, maxSpeed) {
-    return Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
-}, _Typecadence_createCaret = function _Typecadence_createCaret(animationSettings) {
-    const caret = document.createElement("span");
-    caret.classList.add("typecadence-caret");
-    caret.textContent = animationSettings.caretChar;
-    caret.style.color = animationSettings.caretColor;
-    caret.style.fontWeight = animationSettings.caretBold ? "bold" : "normal";
-    caret.style.visibility = "visible";
-    return caret;
-}, _Typecadence_parsePercent = function _Typecadence_parsePercent(percentAttribute) {
-    const percent = parseInt(percentAttribute || '');
-    return isNaN(percent) || percent < 0 ? 0 : (percent > 100 ? 100 : percent);
 }, _Typecadence_parseAnimationSettings = function _Typecadence_parseAnimationSettings(element) {
+    var _a, _b, _c, _d, _e;
     const delayAttribute = parseInt(element.getAttribute("data-typecadence-delay"));
     const delay = isNaN(delayAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").delay : delayAttribute;
     const [minSpeed, maxSpeed] = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseSpeedAttribute).call(this, element.getAttribute("data-typecadence-speed"));
-    const displayCaretAttribute = element.getAttribute("data-typecadence-caret");
+    const displayCaretAttribute = (_a = element.getAttribute("data-typecadence-caret")) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase();
     const caret = displayCaretAttribute !== null ? displayCaretAttribute === "true" : __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlink;
     const caretChar = element.getAttribute("data-typecadence-caret-char") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretChar;
     const caretColor = element.getAttribute("data-typecadence-caret-color") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretColor;
-    const caretBoldAttribute = element.getAttribute("data-typecadence-caret-bold");
+    const caretBoldAttribute = (_b = element.getAttribute("data-typecadence-caret-bold")) === null || _b === void 0 ? void 0 : _b.toLocaleLowerCase();
     const caretBold = caretBoldAttribute !== null ? caretBoldAttribute === "true" : __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlink;
     const caretBlinkSpeedAttribute = parseInt(element.getAttribute("data-typecadence-caret-blink-speed"));
     const caretBlinkSpeed = isNaN(caretBlinkSpeedAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlinkSpeed : caretBlinkSpeedAttribute;
-    const caretBlinkAttribute = element.getAttribute("data-typecadence-caret-blink");
+    const caretBlinkAttribute = (_c = element.getAttribute("data-typecadence-caret-blink")) === null || _c === void 0 ? void 0 : _c.toLocaleLowerCase();
     const caretBlink = caretBlinkAttribute !== null ? caretBlinkAttribute === "true" : __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlink;
-    const caretRemain = (element.getAttribute("data-typecadence-caret-remain") === "true") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemain;
+    const caretRemain = (((_d = element.getAttribute("data-typecadence-caret-remain")) === null || _d === void 0 ? void 0 : _d.toLocaleLowerCase()) === "true") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemain;
     const caretRemainTimeoutAttribute = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout"));
     const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemainTimeout : caretRemainTimeoutAttribute;
     const mistakes = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parsePercent).call(this, element.getAttribute("data-typecadence-mistakes")) || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakes;
     const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
     const mistakesPresent = mistakesPresentAttribute < 1 && isNaN(mistakesPresentAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakesPresent : Math.max(1, mistakesPresentAttribute);
+    const keyboardAttribute = (_e = element.getAttribute("data-typecadence-keyboard")) === null || _e === void 0 ? void 0 : _e.toLowerCase();
+    const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
+        keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
+            __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").keyboard;
     return {
         delay,
         minSpeed,
@@ -255,14 +351,36 @@ _Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMa
         caretRemainTimeout,
         mistakes,
         mistakesPresent,
+        keyboard
     };
+}, _Typecadence_parseSpeedAttribute = function _Typecadence_parseSpeedAttribute(speedAttribute) {
+    const regex = /^\d+(?:[,-]\d+)?$/;
+    if (!speedAttribute || !regex.test(speedAttribute))
+        return [__classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").minSpeed, __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").maxSpeed];
+    const speedValues = speedAttribute.split(/[,-]/).map(Number);
+    if (speedValues.length === 1)
+        return [speedValues[0], speedValues[0]];
+    return [speedValues[0], speedValues[1]];
+}, _Typecadence_parsePercent = function _Typecadence_parsePercent(percentAttribute) {
+    const percent = parseInt(percentAttribute || '');
+    return isNaN(percent) || percent < 0 ? 0 : (percent > 100 ? 100 : percent);
+}, _Typecadence_getTypingSpeed = function _Typecadence_getTypingSpeed(minSpeed, maxSpeed) {
+    return Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
+}, _Typecadence_createCaret = function _Typecadence_createCaret(animationSettings) {
+    const caret = document.createElement("span");
+    caret.classList.add("typecadence-caret");
+    caret.textContent = animationSettings.caretChar;
+    caret.style.color = animationSettings.caretColor;
+    caret.style.fontWeight = animationSettings.caretBold ? "bold" : "normal";
+    caret.style.visibility = "visible";
+    return caret;
 }, _Typecadence_isMistake = function _Typecadence_isMistake(chance) {
     if (chance <= 0)
         return false;
     return Math.random() * 100 < chance;
-}, _Typecadence_incorrectChar = function _Typecadence_incorrectChar(desiredChar) {
+}, _Typecadence_incorrectChar = function _Typecadence_incorrectChar(desiredChar, keyboard = 'qwerty') {
     const desiredCharLower = desiredChar.toLowerCase();
-    const adjacentChars = __classPrivateFieldGet(this, _Typecadence_adjacentMapping, "f").qwerty[desiredCharLower];
+    const adjacentChars = __classPrivateFieldGet(this, _Typecadence_adjacentMapping, "f")[keyboard][desiredCharLower];
     if (!adjacentChars) {
         return desiredChar;
     }
