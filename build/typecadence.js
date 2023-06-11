@@ -332,7 +332,8 @@ _Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMa
     const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemainTimeout : caretRemainTimeoutAttribute;
     const mistakes = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parsePercent).call(this, element.getAttribute("data-typecadence-mistakes")) || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakes;
     const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
-    const mistakesPresent = mistakesPresentAttribute < 1 && isNaN(mistakesPresentAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakesPresent : Math.max(1, mistakesPresentAttribute);
+    const mistakesPresent = mistakesPresentAttribute < 0 || isNaN(mistakesPresentAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakesPresent : Math.max(1, mistakesPresentAttribute);
+    console.log(mistakesPresent);
     const keyboardAttribute = (_e = element.getAttribute("data-typecadence-keyboard")) === null || _e === void 0 ? void 0 : _e.toLowerCase();
     const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
         keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :

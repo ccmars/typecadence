@@ -241,7 +241,8 @@ class Typecadence {
     const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? this.#defaultSettings.caretRemainTimeout : caretRemainTimeoutAttribute;
     const mistakes = this.#parsePercent(element.getAttribute("data-typecadence-mistakes")) || this.#defaultSettings.mistakes;
     const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
-    const mistakesPresent = mistakesPresentAttribute < 1 && isNaN(mistakesPresentAttribute) ? this.#defaultSettings.mistakesPresent : Math.max(1, mistakesPresentAttribute);
+    const mistakesPresent = mistakesPresentAttribute < 0 || isNaN(mistakesPresentAttribute) ? this.#defaultSettings.mistakesPresent : Math.max(1, mistakesPresentAttribute);
+    console.log(mistakesPresent);
     const keyboardAttribute = element.getAttribute("data-typecadence-keyboard")?.toLowerCase();
     const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
                      keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
