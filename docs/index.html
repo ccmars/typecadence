@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta charset='UTF-8'>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+	<title>Typecadence Demo</title>
+	<link rel='stylesheet' href='style/style.min.css'>
+</head>
+<body>
+	<main>
+		<img src='images/typecadence_logo.svg' alt='Typecadence logo' class='logo'>
+		<h1>Natural typing animations</h1>
+
+		<p>Typecadence is a JavaScript library that provides an animated typing effect that simulates natural human typing, including speed variations and mistakes. It works by applying the effect to any HTML element with the class "typecadence".</p>
+		<code>
+			&lt;span class="typecadence"&gt;This is Typecadence with its default settings.&lt;/span&gt;
+		</code>
+		<div class='typecadence'>
+			This is Typecadence with its default settings.
+		</div>
+
+		<section>
+			<h2>Typing</h2>
+
+			<h3>Typing: Delay</h3>
+			<p>The start of the typing animation can be delayed using the data-typecadence-delay attribute. The value is in milliseconds.</p>
+			<code>
+				&lt;span class="typecadence" <b>data-typecadence-delay</b>="3000"&gt;This is Typecadence with a start delay.&lt;/span&gt;
+			</code>
+			<div class='typecadence' data-typecadence-delay='3000'>
+				This is Typecadence with a start delay.
+			</div>
+
+			<h3>Typing: Speed</h3>
+			<p>The minimum and maximum typing speed can be set using the data-typecadence-speed attribute. The value is a range
+				in milliseconds separated by a comma.</p>
+			<code>
+				&lt;span class="typecadence" <b>data-typecadence-speed</b>="200,1400"&gt;This is Typecadence with a custom speed.&lt;/span&gt;
+			</code>
+			<div class='typecadence' data-typecadence-speed='200,1400'>
+				This is Typecadence with a custom speed.
+			</div>
+		</section>
+
+		<section>
+			<h2>Caret</h2>
+
+			<h3>Caret: Display</h3>
+			<p>The caret can be enabled or disabled using the <code>data-typecadence-caret</code> attribute. The value is a boolean.</p>
+			<code>
+				&lt;span class="typecadence" <b>data-typecadence-caret</b>="false"&gt;This is Typecadence with caret.&lt;/span&gt;
+			</code>
+			<div class='typecadence' data-typecadence-caret='false'>
+				This is Typecadence without a caret.
+			</div>
+		</section>
+	</main>
+	<script src='../dist/typecadence.js'></script>
+</body>
+</html>
