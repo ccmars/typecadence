@@ -1,0 +1,49 @@
+body {
+  background: #0d1f27;
+  color: #fcf7ea;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+header,
+section {
+  margin: 3em 0;
+  padding: 1em 0;
+}
+header main,
+section main {
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 0 1em;
+}
+header main h2,
+section main h2 {
+  margin-top: 0;
+}
+header main p code,
+section main p code {
+  font-style: italic;
+  color: #f8b09d;
+}
+header main > code,
+section main > code {
+  display: block;
+}
+header main > code b,
+section main > code b {
+  color: #fec909;
+}
+
+section {
+  background-color: #04423b;
+}
+
+.typecadence {
+  font-family: Consolas, monospace;
+  font-size: 24px;
+}
+
+/*# sourceMappingURL=style.css.map */
