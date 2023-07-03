@@ -228,22 +228,24 @@ class Typecadence {
     const [minSpeed, maxSpeed] = this.#parseSpeedAttribute(element.getAttribute("data-typecadence-speed"));
     const displayCaretAttribute = element.getAttribute("data-typecadence-caret")?.toLowerCase();
     const caret = displayCaretAttribute === "true" ? true :
-                  displayCaretAttribute === "false" ? false :
-                  this.#defaultSettings.caret;
-    console.log(displayCaretAttribute);
+      displayCaretAttribute === "false" ? false :
+        this.#defaultSettings.caret;
     const caretChar = element.getAttribute("data-typecadence-caret-char") || this.#defaultSettings.caretChar;
     const caretColor = element.getAttribute("data-typecadence-caret-color") || this.#defaultSettings.caretColor;
     const caretBoldAttribute = element.getAttribute("data-typecadence-caret-bold")?.toLowerCase();
     const caretBold = caretBoldAttribute === "true" ? true :
-                      caretBoldAttribute === "false" ? false :
-                      this.#defaultSettings.caretBold;
+      caretBoldAttribute === "false" ? false :
+        this.#defaultSettings.caretBold;
     const caretBlinkSpeedAttribute = parseInt(element.getAttribute("data-typecadence-caret-blink-speed"));
     const caretBlinkSpeed = isNaN(caretBlinkSpeedAttribute) ? this.#defaultSettings.caretBlinkSpeed : caretBlinkSpeedAttribute;
     const caretBlinkAttribute = element.getAttribute("data-typecadence-caret-blink")?.toLowerCase();
     const caretBlink = caretBlinkAttribute === "true" ? true :
-                       caretBlinkAttribute === "false" ? false :
-                       this.#defaultSettings.caretBlink;
-    const caretRemain = (element.getAttribute("data-typecadence-caret-remain")?.toLocaleLowerCase() === "true") || this.#defaultSettings.caretRemain;
+      caretBlinkAttribute === "false" ? false :
+        this.#defaultSettings.caretBlink;
+    const caretRemainAttribute = element.getAttribute("data-typecadence-caret-remain")?.toLowerCase();
+    const caretRemain = caretRemainAttribute === "true" ? true :
+      caretRemainAttribute === "false" ? false :
+        this.#defaultSettings.caretRemain;
     const caretRemainTimeoutAttribute = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout"));
     const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? this.#defaultSettings.caretRemainTimeout : caretRemainTimeoutAttribute;
     const mistakes = this.#parsePercent(element.getAttribute("data-typecadence-mistakes")) || this.#defaultSettings.mistakes;
@@ -251,8 +253,8 @@ class Typecadence {
     const mistakesPresent = mistakesPresentAttribute < 0 || isNaN(mistakesPresentAttribute) ? this.#defaultSettings.mistakesPresent : Math.max(1, mistakesPresentAttribute);
     const keyboardAttribute = element.getAttribute("data-typecadence-keyboard")?.toLowerCase();
     const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
-                     keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
-                     this.#defaultSettings.keyboard;
+      keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
+        this.#defaultSettings.keyboard;
 
     return {
       delay,
@@ -356,7 +358,7 @@ class Typecadence {
 
     // Delay before typing
     await new Promise((resolve) => setTimeout(resolve, animationSettings.delay));
-    
+
     let mistakeBuffer: number[] = [];
     let currentIndex = 0;
 
@@ -409,8 +411,8 @@ class Typecadence {
 
     // Hide caret
     if (animationSettings.caret) {
-      if (caretAnimationInterval && animationSettings.caretRemain) {
-        if (!isNaN(animationSettings.caretRemainTimeout)) {
+      if (caretAnimationInterval && (animationSettings.caretRemain || animationSettings.caretRemainTimeout)) {
+        if (animationSettings.caretRemainTimeout) {
           setTimeout(() => {
             clearInterval(caretAnimationInterval);
             if (caret) {

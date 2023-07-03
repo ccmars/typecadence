@@ -285,8 +285,8 @@ class Typecadence {
             }
             // Hide caret
             if (animationSettings.caret) {
-                if (caretAnimationInterval && animationSettings.caretRemain) {
-                    if (!isNaN(animationSettings.caretRemainTimeout)) {
+                if (caretAnimationInterval && (animationSettings.caretRemain || animationSettings.caretRemainTimeout)) {
+                    if (animationSettings.caretRemainTimeout) {
                         setTimeout(() => {
                             clearInterval(caretAnimationInterval);
                             if (caret) {
@@ -321,7 +321,6 @@ _Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMa
     const caret = displayCaretAttribute === "true" ? true :
         displayCaretAttribute === "false" ? false :
             __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caret;
-    console.log(displayCaretAttribute);
     const caretChar = element.getAttribute("data-typecadence-caret-char") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretChar;
     const caretColor = element.getAttribute("data-typecadence-caret-color") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretColor;
     const caretBoldAttribute = (_b = element.getAttribute("data-typecadence-caret-bold")) === null || _b === void 0 ? void 0 : _b.toLowerCase();
@@ -334,7 +333,10 @@ _Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMa
     const caretBlink = caretBlinkAttribute === "true" ? true :
         caretBlinkAttribute === "false" ? false :
             __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlink;
-    const caretRemain = (((_d = element.getAttribute("data-typecadence-caret-remain")) === null || _d === void 0 ? void 0 : _d.toLocaleLowerCase()) === "true") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemain;
+    const caretRemainAttribute = (_d = element.getAttribute("data-typecadence-caret-remain")) === null || _d === void 0 ? void 0 : _d.toLowerCase();
+    const caretRemain = caretRemainAttribute === "true" ? true :
+        caretRemainAttribute === "false" ? false :
+            __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemain;
     const caretRemainTimeoutAttribute = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout"));
     const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemainTimeout : caretRemainTimeoutAttribute;
     const mistakes = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parsePercent).call(this, element.getAttribute("data-typecadence-mistakes")) || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakes;
