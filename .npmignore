@@ -1,4 +1,7 @@
 node_modules
+.github
+.idea
+.vscode
 src
 docs
 tests
