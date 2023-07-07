@@ -11,28 +11,25 @@
 	"main": "dist/typecadence.js",
 	"repository": "github:ccmars/typecadence",
 	"bugs": {
-		"url" : "https://github.com/ccmars/typecadence/issues"
+		"url": "https://github.com/ccmars/typecadence/issues"
 	},
 	"funding": {
 		"type": "kofi",
 		"url": "https://ko-fi.com/ccmars"
 	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
 	"keywords": [
-		"Lightweight JavaScript library",
-		"Typing animation",
-		"Human-like typing effect",
-		"Realistic typing simulation",
-		"Easy-to-use JavaScript typing library",
-		"Human typist errors simulation",
-		"Adaptive typing animation",
-		"User-friendly typing effect library",
-		"Interactive typing animation",
-		"JavaScript typing effect with human flaws",
-		"Natural typing animation",
-		"Mimics human typing errors",
-		"Typing library with automatic flaws",
-		"JS typing effect library"
-	],
-	"dependencies": {
-	}
+		"javascript",
+		"library",
+		"typing",
+		"animation",
+		"human-like",
+		"simulation",
+		"interactive",
+		"realistic",
+		"user-friendly",
+		"natural"
+	]
 }
