@@ -8,10 +8,39 @@ body {
   padding: 0;
 }
 
+a {
+  color: #fec909;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 960px) {
+  header {
+    margin-top: 0 !important;
+  }
+  header main img {
+    margin: 0 1em;
+  }
+}
 header,
 section {
   margin: 3em 0;
   padding: 1em 0;
+}
+header p > code,
+section p > code {
+  font-style: italic;
+  color: #f8b09d;
+}
+header main > code, header div > code,
+section main > code,
+section div > code {
+  display: block;
+  border: 2px solid rgba(13, 31, 39, 0.2);
+  background: linear-gradient(122deg, rgba(47, 40, 40, 0.5), rgba(47, 40, 40, 0.2));
+  padding: 1em;
 }
 header main,
 section main {
@@ -19,31 +48,47 @@ section main {
   max-width: 960px;
   padding: 0 1em;
 }
+header main h1,
+section main h1 {
+  font-size: 38px;
+}
 header main h2,
 section main h2 {
-  margin-top: 0;
+  margin-top: 1em;
+  font-size: 30px;
 }
-header main p code,
-section main p code {
-  font-style: italic;
-  color: #f8b09d;
+header main code b,
+section main code b {
+  color: #ec7e5a;
 }
-header main > code,
-section main > code {
-  display: block;
-}
-header main > code b,
-section main > code b {
+header main code i,
+section main code i {
   color: #fec909;
+}
+header main div,
+section main div {
+  margin: 0 0 0 2em;
+}
+header main div var,
+section main div var {
+  font-style: normal;
+  cursor: help;
+  border-bottom: 1px dotted #f8b09d;
+}
+header main > div,
+section main > div {
+  margin: 3em 0;
 }
 
 section {
   background-color: #04423b;
 }
 
-.typecadence {
+div.typecadence {
   font-family: Consolas, monospace;
   font-size: 24px;
+  line-height: 1.5;
+  margin: 0.75em 0;
 }
 
 /*# sourceMappingURL=style.css.map */
