@@ -21,15 +21,18 @@
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [
-		"javascript",
-		"library",
 		"typing",
 		"animation",
+		"automatic",
+		"typewriter",
 		"human-like",
+		"natural",
 		"simulation",
-		"interactive",
 		"realistic",
+		"lightweight",
 		"user-friendly",
-		"natural"
+		"javascript",
+		"typescript",
+		"library"
 	]
 }
