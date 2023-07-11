@@ -1,7 +1,7 @@
 {
 	"name": "typecadence",
 	"description": "Typing animation library that automatically mimics the flaws a human typist",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"license": "CC0-1.0",
 	"author": {
 		"name": "Cole Marshall",
