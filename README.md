@@ -1,9 +1,8 @@
 ![Typecadence](https://typecadence.colemarshall.net/images/typecadence_logo.svg)
 
-![NPM](https://img.shields.io/npm/l/typecadence?style=for-the-badge)
-![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/ccmars/typecadence/main?style=for-the-badge)
-![npm](https://img.shields.io/npm/v/typecadence?style=for-the-badge)
-![npm](https://img.shields.io/npm/dt/typecadence?style=for-the-badge)
+![NPM License](https://img.shields.io/npm/l/typecadence?style=for-the-badge)
+![NPM Version](https://img.shields.io/npm/v/typecadence?style=for-the-badge)
+![NPM Downloads](https://img.shields.io/npm/dt/typecadence?style=for-the-badge)
 ![GitHub Repo stars](https://img.shields.io/github/stars/ccmars/typecadence?style=for-the-badge)
 ![GitHub file size in bytes on a specified ref (branch/commit/tag)](https://img.shields.io/github/size/ccmars/typecadence/dist%2Ftypecadence.js?style=for-the-badge)
 
