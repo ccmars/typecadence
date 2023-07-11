@@ -7,7 +7,7 @@
 		"name": "Cole Marshall",
 		"url": "https://colemarshall.net/"
 	},
-	"homepage": "https://ccmars.github.io/typecadence/",
+	"homepage": "https://typecadence.colemarshall.net/",
 	"main": "dist/typecadence.js",
 	"repository": "github:ccmars/typecadence",
 	"bugs": {
