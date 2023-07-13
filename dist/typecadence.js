@@ -36,6 +36,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             _Typecadence_instances.add(this);
             _Typecadence_elements.set(this, void 0);
             _Typecadence_defaultSettings.set(this, {
+                debug: false,
                 delay: 0,
                 minSpeed: 50,
                 maxSpeed: 100,
@@ -319,40 +320,44 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             }
         }
     }, _Typecadence_parseAnimationSettings = function _Typecadence_parseAnimationSettings(element) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _e, _f;
+        const debugAttribute = (_a = element.getAttribute("data-typecadence-debug")) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+        const debug = debugAttribute === "true" ? true : debugAttribute === "false" ? false : __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").debug;
         const delayAttribute = parseInt(element.getAttribute("data-typecadence-delay"));
         const delay = isNaN(delayAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").delay : delayAttribute;
         const [minSpeed, maxSpeed] = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseSpeedAttribute).call(this, element.getAttribute("data-typecadence-speed"));
-        const displayCaretAttribute = (_a = element.getAttribute("data-typecadence-caret")) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+        const displayCaretAttribute = (_b = element.getAttribute("data-typecadence-caret")) === null || _b === void 0 ? void 0 : _b.toLowerCase();
         const caret = displayCaretAttribute === "true" ? true :
             displayCaretAttribute === "false" ? false :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caret;
         const caretChar = element.getAttribute("data-typecadence-caret-char") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretChar;
         const caretColor = element.getAttribute("data-typecadence-caret-color") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretColor;
-        const caretBoldAttribute = (_b = element.getAttribute("data-typecadence-caret-bold")) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+        const caretBoldAttribute = (_c = element.getAttribute("data-typecadence-caret-bold")) === null || _c === void 0 ? void 0 : _c.toLowerCase();
         const caretBold = caretBoldAttribute === "true" ? true :
             caretBoldAttribute === "false" ? false :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBold;
         const caretBlinkSpeedAttribute = parseInt(element.getAttribute("data-typecadence-caret-blink-speed"));
         const caretBlinkSpeed = isNaN(caretBlinkSpeedAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlinkSpeed : caretBlinkSpeedAttribute;
-        const caretBlinkAttribute = (_c = element.getAttribute("data-typecadence-caret-blink")) === null || _c === void 0 ? void 0 : _c.toLowerCase();
+        const caretBlinkAttribute = (_d = element.getAttribute("data-typecadence-caret-blink")) === null || _d === void 0 ? void 0 : _d.toLowerCase();
         const caretBlink = caretBlinkAttribute === "true" ? true :
             caretBlinkAttribute === "false" ? false :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlink;
-        const caretRemainAttribute = (_d = element.getAttribute("data-typecadence-caret-remain")) === null || _d === void 0 ? void 0 : _d.toLowerCase();
+        const caretRemainAttribute = (_e = element.getAttribute("data-typecadence-caret-remain")) === null || _e === void 0 ? void 0 : _e.toLowerCase();
         const caretRemain = caretRemainAttribute === "true" ? true :
             caretRemainAttribute === "false" ? false :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemain;
         const caretRemainTimeoutAttribute = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout"));
         const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemainTimeout : caretRemainTimeoutAttribute;
-        const mistakes = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parsePercent).call(this, element.getAttribute("data-typecadence-mistakes")) || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakes;
+        const mistakesPercent = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parsePercent).call(this, element.getAttribute("data-typecadence-mistakes"));
+        const mistakes = (mistakesPercent !== null) ? mistakesPercent : __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakes;
         const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
         const mistakesPresent = mistakesPresentAttribute < 0 || isNaN(mistakesPresentAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakesPresent : Math.max(1, mistakesPresentAttribute);
-        const keyboardAttribute = (_e = element.getAttribute("data-typecadence-keyboard")) === null || _e === void 0 ? void 0 : _e.toLowerCase();
+        const keyboardAttribute = (_f = element.getAttribute("data-typecadence-keyboard")) === null || _f === void 0 ? void 0 : _f.toLowerCase();
         const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
             keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").keyboard;
-        return {
+        const animationSettings = {
+            debug,
             delay,
             minSpeed,
             maxSpeed,
@@ -368,6 +373,9 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             mistakesPresent,
             keyboard
         };
+        if (debug)
+            console.debug("Typecadence settings:", animationSettings);
+        return animationSettings;
     }, _Typecadence_parseSpeedAttribute = function _Typecadence_parseSpeedAttribute(speedAttribute) {
         const regex = /^\d+(?:[,-]\d+)?$/;
         if (!speedAttribute || !regex.test(speedAttribute))
@@ -377,8 +385,11 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             return [speedValues[0], speedValues[0]];
         return [speedValues[0], speedValues[1]];
     }, _Typecadence_parsePercent = function _Typecadence_parsePercent(percentAttribute) {
-        const percent = parseInt(percentAttribute || '');
-        return isNaN(percent) || percent < 0 ? 0 : (percent > 100 ? 100 : percent);
+        const percent = parseInt(percentAttribute || '', 10);
+        if (isNaN(percent)) {
+            return null;
+        }
+        return percent < 0 ? 0 : (percent > 100 ? 100 : percent);
     }, _Typecadence_getTypingSpeed = function _Typecadence_getTypingSpeed(minSpeed, maxSpeed) {
         return Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
     }, _Typecadence_createCaret = function _Typecadence_createCaret(animationSettings) {
