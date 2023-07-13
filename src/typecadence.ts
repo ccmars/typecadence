@@ -16,6 +16,7 @@ declare var define: any;
   class Typecadence {
     readonly #elements: NodeListOf<HTMLElement>;
     readonly #defaultSettings: AnimationSettings = {
+      debug: false,
       delay: 0,
       minSpeed: 50,
       maxSpeed: 100,
@@ -215,6 +216,8 @@ declare var define: any;
     }
 
     #parseAnimationSettings(element: HTMLElement): AnimationSettings {
+      const debugAttribute = element.getAttribute("data-typecadence-debug")?.toLowerCase();
+      const debug = debugAttribute === "true" ? true : debugAttribute === "false" ? false : this.#defaultSettings.debug;
       const delayAttribute = parseInt(element.getAttribute("data-typecadence-delay"));
       const delay = isNaN(delayAttribute) ? this.#defaultSettings.delay : delayAttribute;
       const [minSpeed, maxSpeed] = this.#parseSpeedAttribute(element.getAttribute("data-typecadence-speed"));
@@ -240,7 +243,8 @@ declare var define: any;
           this.#defaultSettings.caretRemain;
       const caretRemainTimeoutAttribute = parseInt(element.getAttribute("data-typecadence-caret-remain-timeout"));
       const caretRemainTimeout = isNaN(caretRemainTimeoutAttribute) ? this.#defaultSettings.caretRemainTimeout : caretRemainTimeoutAttribute;
-      const mistakes = this.#parsePercent(element.getAttribute("data-typecadence-mistakes")) || this.#defaultSettings.mistakes;
+      const mistakesPercent = this.#parsePercent(element.getAttribute("data-typecadence-mistakes"));
+      const mistakes = (mistakesPercent !== null) ? mistakesPercent : this.#defaultSettings.mistakes;
       const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
       const mistakesPresent = mistakesPresentAttribute < 0 || isNaN(mistakesPresentAttribute) ? this.#defaultSettings.mistakesPresent : Math.max(1, mistakesPresentAttribute);
       const keyboardAttribute = element.getAttribute("data-typecadence-keyboard")?.toLowerCase();
@@ -248,7 +252,8 @@ declare var define: any;
         keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
           this.#defaultSettings.keyboard;
 
-      return {
+      const animationSettings = {
+        debug,
         delay,
         minSpeed,
         maxSpeed,
@@ -264,6 +269,9 @@ declare var define: any;
         mistakesPresent,
         keyboard
       };
+
+      if (debug) console.debug("Typecadence settings:", animationSettings);
+      return animationSettings;
     }
 
     #parseSpeedAttribute(speedAttribute: string | null): [number, number] {
@@ -276,8 +284,11 @@ declare var define: any;
     }
 
     #parsePercent(percentAttribute: string | null): number {
-      const percent = parseInt(percentAttribute || '');
-      return isNaN(percent) || percent < 0 ? 0 : (percent > 100 ? 100 : percent);
+      const percent = parseInt(percentAttribute || '', 10);
+      if (isNaN(percent)) {
+        return null;
+      }
+      return percent < 0 ? 0 : (percent > 100 ? 100 : percent);
     }
 
     #getTypingSpeed(minSpeed: number, maxSpeed: number): number {
@@ -423,6 +434,7 @@ declare var define: any;
   }
 
   interface AnimationSettings {
+    debug: boolean;
     delay: number;
     minSpeed: number;
     maxSpeed: number;
