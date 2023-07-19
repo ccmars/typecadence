@@ -13,10 +13,16 @@
 	"bugs": {
 		"url": "https://github.com/ccmars/typecadence/issues"
 	},
-	"funding": {
-		"type": "kofi",
-		"url": "https://ko-fi.com/ccmars"
-	},
+	"funding": [
+		{
+			"type": "kofi",
+			"url": "https://ko-fi.com/ccmars"
+		},
+		{
+			"type": "github",
+			"url": "https://github.com/sponsors/ccmars"
+		}
+	],
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
