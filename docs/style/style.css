@@ -41,6 +41,7 @@ section div > code {
   border: 2px solid rgba(13, 31, 39, 0.2);
   background: linear-gradient(122deg, rgba(47, 40, 40, 0.5), rgba(47, 40, 40, 0.2));
   padding: 1em;
+  overflow: hidden;
 }
 header main,
 section main {
