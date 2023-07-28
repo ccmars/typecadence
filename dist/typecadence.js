@@ -266,7 +266,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                     }
                     // Type next character
                     const char = text[currentIndex];
-                    const isMistake = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, animationSettings.mistakes);
+                    const isMistake = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, char, animationSettings.mistakes);
                     if (isMistake) {
                         const charNode = document.createTextNode(__classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_incorrectChar).call(this, char, animationSettings.keyboard));
                         if (caret) {
@@ -400,8 +400,10 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
         caret.style.fontWeight = animationSettings.caretBold ? "bold" : "normal";
         caret.style.visibility = "visible";
         return caret;
-    }, _Typecadence_isMistake = function _Typecadence_isMistake(chance) {
+    }, _Typecadence_isMistake = function _Typecadence_isMistake(char, chance) {
         if (chance <= 0)
+            return false;
+        if (char.match(/\s/))
             return false;
         return Math.random() * 100 < chance;
     }, _Typecadence_incorrectChar = function _Typecadence_incorrectChar(desiredChar, keyboard = 'qwerty') {
