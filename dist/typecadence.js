@@ -266,16 +266,19 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                     }
                     // Type next character
                     const char = text[currentIndex];
-                    const isMistake = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, char, animationSettings.mistakes);
+                    const isMistake = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, animationSettings.mistakes);
                     if (isMistake) {
-                        const charNode = document.createTextNode(__classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_incorrectChar).call(this, char, animationSettings.keyboard));
+                        const incorrectChar = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_incorrectChar).call(this, char, animationSettings.keyboard);
+                        const charNode = document.createTextNode(incorrectChar);
                         if (caret) {
                             element.insertBefore(charNode, caret);
                         }
                         else {
                             element.appendChild(charNode);
                         }
-                        mistakeBuffer.push(currentIndex);
+                        if (char !== incorrectChar) {
+                            mistakeBuffer.push(currentIndex);
+                        }
                     }
                     else {
                         const charNode = document.createTextNode(char);
@@ -400,10 +403,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
         caret.style.fontWeight = animationSettings.caretBold ? "bold" : "normal";
         caret.style.visibility = "visible";
         return caret;
-    }, _Typecadence_isMistake = function _Typecadence_isMistake(char, chance) {
+    }, _Typecadence_isMistake = function _Typecadence_isMistake(chance) {
         if (chance <= 0)
-            return false;
-        if (char.match(/\s/))
             return false;
         return Math.random() * 100 < chance;
     }, _Typecadence_incorrectChar = function _Typecadence_incorrectChar(desiredChar, keyboard = 'qwerty') {

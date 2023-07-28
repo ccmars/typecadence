@@ -305,9 +305,8 @@ declare var define: any;
       return caret;
     }
 
-    #isMistake(char: string, chance: number): boolean {
+    #isMistake(chance: number): boolean {
       if (chance <= 0) return false;
-      if (char.match(/\s/)) return false;
       return Math.random() * 100 < chance;
     }
 
@@ -389,15 +388,18 @@ declare var define: any;
 
         // Type next character
         const char = text[currentIndex];
-        const isMistake = this.#isMistake(char,animationSettings.mistakes);
+        const isMistake = this.#isMistake(animationSettings.mistakes);
         if (isMistake) {
-          const charNode = document.createTextNode(this.#incorrectChar(char, animationSettings.keyboard));
+          const incorrectChar = this.#incorrectChar(char, animationSettings.keyboard);
+          const charNode = document.createTextNode(incorrectChar);
           if (caret) {
             element.insertBefore(charNode, caret);
           } else {
             element.appendChild(charNode);
           }
-          mistakeBuffer.push(currentIndex);
+          if (char !== incorrectChar) {
+            mistakeBuffer.push(currentIndex);
+          }
         } else {
           const charNode = document.createTextNode(char);
           if (caret) {
