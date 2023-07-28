@@ -9,6 +9,8 @@
 # Typecadence
 A JavaScript typing-animation library that automatically mimics the flaws of a human typist.
 
+![Typecadence Demo](https://typecadence.colemarshall.net/images/demo.gif)
+
 ## Quick Start
 Include the latest version of the Typecadence v1 script in your HTML file:
 ```html

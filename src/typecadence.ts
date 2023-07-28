@@ -305,8 +305,9 @@ declare var define: any;
       return caret;
     }
 
-    #isMistake(chance: number): boolean {
+    #isMistake(char: string, chance: number): boolean {
       if (chance <= 0) return false;
+      if (char.match(/\s/)) return false;
       return Math.random() * 100 < chance;
     }
 
@@ -388,7 +389,7 @@ declare var define: any;
 
         // Type next character
         const char = text[currentIndex];
-        const isMistake = this.#isMistake(animationSettings.mistakes);
+        const isMistake = this.#isMistake(char,animationSettings.mistakes);
         if (isMistake) {
           const charNode = document.createTextNode(this.#incorrectChar(char, animationSettings.keyboard));
           if (caret) {

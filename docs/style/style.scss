@@ -111,3 +111,19 @@ div.typecadence {
 	line-height: 1.5;
 	margin: 0.75em 0;
 }
+
+#demo {
+	background-color: $color-greenDark;
+	overflow:hidden;
+	
+	.typecadence {
+		display: block;
+		border: 2px solid rgba($color-greenDarkest, 0.2);
+		background: rgba($color-orangeDark, 0.5);
+		padding: 1em;
+		overflow: hidden;
+		height: 150px;
+		width:680px;
+		margin: 12px auto;
+	}
+}
