@@ -1,374 +1,374 @@
 <!DOCTYPE html>
 <html lang='en'>
 <head>
-	<meta charset='UTF-8'>
-	<meta name='viewport'
-		  content='width=device-width, initial-scale=1.0'>
-	<title>Typecadence - Natural typing animations</title>
-	<link rel='stylesheet'
-		  href='style/style.css'>
+  <meta charset='UTF-8'>
+  <meta name='viewport'
+      content='width=device-width, initial-scale=1.0'>
+  <title>Typecadence - Natural typing animations</title>
+  <link rel='stylesheet'
+      href='style/style.css'>
 </head>
 
 <body>
 <header>
-	<main>
-		<a href='https://github.com/ccmars/typecadence'><img
-			src='images/typecadence_logo.svg'
-			alt='Typecadence logo'
-			class='logo'></a>
-		<h1>Natural typing animations</h1>
-		<p>
-			Typecadence is a JavaScript library that provides an animated typing effect that automatically simulates natural human typing, including speed variations and mistakes. It applies the animation to any HTML element with the class <code>typecadence</code>, which plays only when the element is visible to the user.
-		</p>
-		<code>
-			&lt;span <b>class</b>="<i>typecadence</i>"&gt;This is Typecadence with its default settings.&lt;/span&gt;
-		</code>
-		<div class='typecadence'>
-			This is Typecadence with its default settings.
-		</div>
-	</main>
+  <main>
+    <a href='https://github.com/ccmars/typecadence'><img
+      src='images/typecadence_logo.svg'
+      alt='Typecadence logo'
+      class='logo'></a>
+    <h1>Natural typing animations</h1>
+    <p>
+      Typecadence is a JavaScript library that provides an animated typing effect that automatically simulates natural human typing, including speed variations and mistakes. It applies the animation to any HTML element with the class <code>typecadence</code>, which plays only when the element is visible to the user.
+    </p>
+    <code>
+      &lt;span <b>class</b>="<i>typecadence</i>"&gt;This is Typecadence with its default settings.&lt;/span&gt;
+    </code>
+    <div class='typecadence'>
+      This is Typecadence with its default settings.
+    </div>
+  </main>
 </header>
 
 <section>
-	<main>
-		<h2 class='typecadence'
-			data-typecadence-speed='25'
-			data-typecadence-caret-remain='true'
-			data-typecadence-caret-color='#cc2127'
-			data-typecadence-caret-char='_'
-			data-typecadence-mistakes='0'
-			data-typecadence-caret-blink-speed='750'
-		>
-			Installation Options
-		</h2>
-		
-		<div>
-			<h3>CDN (Recommended)</h3>
-			<p>
-				Include the following <code>script</code> tag in your HTML document:
-			</p>
-			<code>
-				&lt;script <b>src</b>="<i>https://cdn.jsdelivr.net<wbr>/npm<wbr>/typecadence@^1</i>"&gt;&lt;/script&gt;
-			</code>
-		</div>
-		
-		<div>
-			<h3>NPM</h3>
-			<p>
-				Install Typecadence using <a href='https://www.npmjs.com/package/typecadence'>NPM</a> in your project directory via the command line:
-			</p>
-			<code>
-				npm install typecadence
-			</code>
-			<p>
-				Then import Typecadence into your TypeScript/JavaScript project:
-			</p>
-			<code>
-				import Typecadence from 'typecadence';
-			</code>
-		</div>
-		
-		<div>
-			<h3>Download</h3>
-			<p>
-				Download the latest version of Typecadence from the <a href='https://github.com/ccmars/typecadence'>GitHub repository</a> and include the <code>/dist/typecadence.js</code> file in your project.
-			</p>
-		</div>
-	</main>
+  <main>
+    <h2 class='typecadence'
+      data-typecadence-speed='25'
+      data-typecadence-caret-remain='true'
+      data-typecadence-caret-color='#cc2127'
+      data-typecadence-caret-char='_'
+      data-typecadence-mistakes='0'
+      data-typecadence-caret-blink-speed='750'
+    >
+      Installation Options
+    </h2>
+    
+    <div>
+      <h3>CDN (Recommended)</h3>
+      <p>
+        Include the following <code>script</code> tag in your HTML document:
+      </p>
+      <code>
+        &lt;script <b>src</b>="<i>https://cdn.jsdelivr.net<wbr>/npm<wbr>/typecadence@^1</i>"&gt;&lt;/script&gt;
+      </code>
+    </div>
+    
+    <div>
+      <h3>NPM</h3>
+      <p>
+        Install Typecadence using <a href='https://www.npmjs.com/package/typecadence'>NPM</a> in your project directory via the command line:
+      </p>
+      <code>
+        npm install typecadence
+      </code>
+      <p>
+        Then import Typecadence into your TypeScript/JavaScript project:
+      </p>
+      <code>
+        import Typecadence from 'typecadence';
+      </code>
+    </div>
+    
+    <div>
+      <h3>Download</h3>
+      <p>
+        Download the latest version of Typecadence from the <a href='https://github.com/ccmars/typecadence'>GitHub repository</a> and include the <code>/dist/typecadence.js</code> file in your project.
+      </p>
+    </div>
+  </main>
 </section>
 
 <section>
-	<main>
-		<h2 class='typecadence'
-			data-typecadence-speed='25'
-			data-typecadence-caret-remain='true'
-			data-typecadence-caret-color='#cc2127'
-			data-typecadence-caret-char='_'
-			data-typecadence-mistakes='0'
-			data-typecadence-caret-blink-speed='750'
-		>Typing</h2>
-		
-		<div>
-			<h3>Typing: Speed</h3>
-			<div>
-				<p>
-					The minimum and maximum typing speed. The value is a single number of milliseconds or a range in milliseconds separated by a comma. Each new keystroke is typed at the specified speed or a random speed within the specified range.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-speed</code></li>
-					<li><b>Value</b>: <var title='Milliseconds'>Number</var>[,<var title='Milliseconds'>Number</var>]</li>
-					<li><b>Default</b>: <code>50,100</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-speed</b>="<i>200,1400</i>"&gt;This is Typecadence with a custom speed.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-speed='200,1400'>
-					This is Typecadence with a custom speed.
-				</div>
-			</div>
-		</div>
-		
-		<div>
-			<h3>Typing: Delay</h3>
-			<div>
-				<p>
-					The delay before typing starts. The value is a number of milliseconds.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-delay</code></li>
-					<li><b>Value</b>: <var title='Milliseconds'>Number</var></li>
-					<li><b>Default</b>: <code>0</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-delay</b>="<i>3000</i>"&gt;This is Typecadence with a three-second start delay.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-delay='3000'>
-					This is Typecadence with a three-second start delay.
-				</div>
-			</div>
-		</div>
-	</main>
+  <main>
+    <h2 class='typecadence'
+      data-typecadence-speed='25'
+      data-typecadence-caret-remain='true'
+      data-typecadence-caret-color='#cc2127'
+      data-typecadence-caret-char='_'
+      data-typecadence-mistakes='0'
+      data-typecadence-caret-blink-speed='750'
+    >Typing</h2>
+    
+    <div>
+      <h3>Typing: Speed</h3>
+      <div>
+        <p>
+          The minimum and maximum typing speed. The value is a single number of milliseconds or a range in milliseconds separated by a comma. Each new keystroke is typed at the specified speed or a random speed within the specified range.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-speed</code></li>
+          <li><b>Value</b>: <var title='Milliseconds'>Number</var>[,<var title='Milliseconds'>Number</var>]</li>
+          <li><b>Default</b>: <code>50,100</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-speed</b>="<i>200,1400</i>"&gt;This is Typecadence with a custom speed.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-speed='200,1400'>
+          This is Typecadence with a custom speed.
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Typing: Delay</h3>
+      <div>
+        <p>
+          The delay before typing starts. The value is a number of milliseconds.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-delay</code></li>
+          <li><b>Value</b>: <var title='Milliseconds'>Number</var></li>
+          <li><b>Default</b>: <code>0</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-delay</b>="<i>3000</i>"&gt;This is Typecadence with a three-second start delay.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-delay='3000'>
+          This is Typecadence with a three-second start delay.
+        </div>
+      </div>
+    </div>
+  </main>
 </section>
 
 <section>
-	<main>
-		<h2 class='typecadence'
-			data-typecadence-speed='25'
-			data-typecadence-caret-remain='true'
-			data-typecadence-caret-color='#cc2127'
-			data-typecadence-caret-char='_'
-			data-typecadence-mistakes='0'
-			data-typecadence-caret-blink-speed='750'
-		>Mistakes</h2>
-		
-		<div>
-			<h3>Mistakes: Chance</h3>
-			<div>
-				<p>
-					The chance of a mistake being made with each keystroke. The value is a percentage.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-mistakes</code></li>
-					<li><b>Value</b>: <var title='Percentage'>Number</var></li>
-					<li><b>Default</b>: <code>5</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-mistakes</b>="<i>25</i>"&gt;This is Typecadence with a 25% chance of a mistake being made with each keystroke.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-mistakes='25'>
-					This is Typecadence with a 25% chance of a mistake being made with each keystroke.
-				</div>
-			</div>
-		</div>
-		
-		<div>
-			<h3>Mistakes: Present</h3>
-			<div>
-				<p>
-					If there is a chance for mistakes, this is the maximum number of mistakes that can be present before backspacing to correct the earliest mistake.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-mistakes-present</code></li>
-					<li><b>Value</b>: <var title='Mistakes'>Number</var></li>
-					<li><b>Default</b>: <code>1</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-mistakes-present</b>="<i>3</i>"&gt;This is Typecadence with a maximum of three mistakes present before backspacing to correct the earliest mistake.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-mistakes-present='3'>
-					This is Typecadence with a maximum of three mistakes present before backspacing to correct the earliest mistake.
-				</div>
-			</div>
-		</div>
-		
-		<div>
-			<h3>Mistakes: Keyboard Layout</h3>
-			<div>
-				<p>
-					If there is a chance for mistakes, this is the keyboard layout used to determine which keys are adjacent to each other for mistakes.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-mistakes-keyboard</code></li>
-					<li><b>Value</b>: <var title='Keyboard Layout'>String</var></li>
-					<li><b>Options</b>: <code>qwerty</code>, <code>qwertz</code>, or <code>azerty</code></li>
-					<li><b>Default</b>: <code>qwerty</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-mistakes-keyboard</b>="<i>azerty</i>"&gt;This is Typecadence with a AZERTY keyboard layout.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-mistakes-keyboard='azerty'>
-					This is Typecadence with a AZERTY keyboard layout.
-				</div>
-			</div>
-		</div>
-	</main>
+  <main>
+    <h2 class='typecadence'
+      data-typecadence-speed='25'
+      data-typecadence-caret-remain='true'
+      data-typecadence-caret-color='#cc2127'
+      data-typecadence-caret-char='_'
+      data-typecadence-mistakes='0'
+      data-typecadence-caret-blink-speed='750'
+    >Mistakes</h2>
+    
+    <div>
+      <h3>Mistakes: Chance</h3>
+      <div>
+        <p>
+          The chance of a mistake being made with each keystroke. The value is a percentage.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-mistakes</code></li>
+          <li><b>Value</b>: <var title='Percentage'>Number</var></li>
+          <li><b>Default</b>: <code>5</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-mistakes</b>="<i>25</i>"&gt;This is Typecadence with a 25% chance of a mistake being made with each keystroke.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-mistakes='25'>
+          This is Typecadence with a 25% chance of a mistake being made with each keystroke.
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Mistakes: Present</h3>
+      <div>
+        <p>
+          If there is a chance for mistakes, this is the maximum number of mistakes that can be present before backspacing to correct the earliest mistake.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-mistakes-present</code></li>
+          <li><b>Value</b>: <var title='Mistakes'>Number</var></li>
+          <li><b>Default</b>: <code>1</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-mistakes-present</b>="<i>3</i>"&gt;This is Typecadence with a maximum of three mistakes present before backspacing to correct the earliest mistake.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-mistakes-present='3'>
+          This is Typecadence with a maximum of three mistakes present before backspacing to correct the earliest mistake.
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Mistakes: Keyboard Layout</h3>
+      <div>
+        <p>
+          If there is a chance for mistakes, this is the keyboard layout used to determine which keys are adjacent to each other for mistakes.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-mistakes-keyboard</code></li>
+          <li><b>Value</b>: <var title='Keyboard Layout'>String</var></li>
+          <li><b>Options</b>: <code>qwerty</code>, <code>qwertz</code>, or <code>azerty</code></li>
+          <li><b>Default</b>: <code>qwerty</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-mistakes-keyboard</b>="<i>azerty</i>"&gt;This is Typecadence with a AZERTY keyboard layout.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-mistakes-keyboard='azerty'>
+          This is Typecadence with a AZERTY keyboard layout.
+        </div>
+      </div>
+    </div>
+  </main>
 </section>
 
 <section>
-	<main>
-		<h2 class='typecadence'
-			data-typecadence-speed='25'
-			data-typecadence-caret-remain='true'
-			data-typecadence-caret-color='#cc2127'
-			data-typecadence-caret-char='_'
-			data-typecadence-mistakes='0'
-			data-typecadence-caret-blink-speed='750'
-		>Caret</h2>
-		<p>
-			If displayed, the caret is a <code>&lt;span&gt;</code> with a class of <code>typecadence-caret</code>.
-		</p>
-		<div>
-			<h3>Caret: Display</h3>
-			<div>
-				<p>
-					Disable the caret.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-caret</code></li>
-					<li><b>Value</b>: <var title='Display'>Boolean</var></li>
-					<li><b>Default</b>: <code>true</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-caret</b>="<i>false</i>"&gt;This is Typecadence with caret.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-caret='false'>
-					This is Typecadence without a caret.
-				</div>
-			</div>
-		</div>
-		
-		<div>
-			<h3>Caret: Character</h3>
-			<div>
-				<p>
-					The caret character.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-caret-char</code></li>
-					<li><b>Value</b>: <var title='Character'>String</var></li>
-					<li><b>Default</b>: <code>|</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-caret-char</b>="<i>_</i>"&gt;This is Typecadence with a custom caret character.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-caret-char='_'>
-					This is Typecadence with a custom caret character.
-				</div>
-			</div>
-		</div>
-		
-		<div>
-			<h3>Caret: Color</h3>
-			<div>
-				<p>
-					The caret color.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-caret-color</code></li>
-					<li><b>Value</b>: <var title='Color'>String</var></li>
-					<li><b>Default</b>: <code>inherit</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-caret-color</b>="<i>#cc2127</i>"&gt;This is Typecadence with a custom caret color.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-caret-color='#cc2127'>
-					This is Typecadence with a custom caret color.
-				</div>
-			</div>
-		</div>
-		
-		<div>
-			<h3>Caret: Blink</h3>
-			<div>
-				<p>
-					Disable the caret's blinking animation.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-caret-blink</code></li>
-					<li><b>Value</b>: <var title='Blink'>Boolean</var></li>
-					<li><b>Default</b>: <code>true</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-caret-blink</b>="<i>false</i>"&gt;This is Typecadence without a blinking caret.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-caret-blink='false'>
-					This is Typecadence without a blinking caret.
-				</div>
-			</div>
-		</div>
-		
-		<div>
-			<h3>Caret: Blink Speed</h3>
-			<div>
-				<p>
-					The caret blink speed. The value is in milliseconds.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-caret-blink-speed</code></li>
-					<li><b>Value</b>: <var title='Milliseconds'>Number</var></li>
-					<li><b>Default</b>: <code>500</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-caret-blink-speed</b>="<i>1000</i>"&gt;This is Typecadence with a slower blinking caret.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-caret-blink-speed='1000'>
-					This is Typecadence with a slower blinking caret.
-				</div>
-			</div>
-		</div>
-		
-		<div>
-			<h3>Caret: Remain</h3>
-			<div>
-				<p>
-					The caret can be set to permanently remain at the end of the text.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-caret-remain</code></li>
-					<li><b>Value</b>: <var title='Remain'>Boolean</var></li>
-					<li><b>Default</b>: <code>false</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-caret-remain</b>="<i>true</i>"&gt;This is Typecadence with a caret that permanently remains at the end of the text.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-caret-remain='true'>
-					This is Typecadence with a caret that permanently remains at the end of the text.
-				</div>
-			</div>
-		</div>
-		
-		<div>
-			<h3>Caret: Remain Timeout</h3>
-			<div>
-				<p>
-					The caret can be set to remain at the end of the text for a specific amount of time. The value is in milliseconds.
-				</p>
-				<ul>
-					<li><b>Attribute</b>: <code>data-typecadence-caret-remain-timeout</code></li>
-					<li><b>Value</b>: <var title='Milliseconds'>Number</var></li>
-					<li><b>Default</b>: <code>0</code></li>
-				</ul>
-				<code>
-					&lt;span class="typecadence" <b>data-typecadence-caret-remain-timeout</b>="<i>5000</i>"&gt;This is Typecadence with a caret that remains at the end of the text for five seconds.&lt;/span&gt;
-				</code>
-				<div class='typecadence'
-					 data-typecadence-caret-remain-timeout='5000'>
-					This is Typecadence with a caret that remains at the end of the text for five seconds.
-				</div>
-			</div>
-		</div>
-	</main>
+  <main>
+    <h2 class='typecadence'
+      data-typecadence-speed='25'
+      data-typecadence-caret-remain='true'
+      data-typecadence-caret-color='#cc2127'
+      data-typecadence-caret-char='_'
+      data-typecadence-mistakes='0'
+      data-typecadence-caret-blink-speed='750'
+    >Caret</h2>
+    <p>
+      If displayed, the caret is a <code>&lt;span&gt;</code> with a class of <code>typecadence-caret</code>.
+    </p>
+    <div>
+      <h3>Caret: Display</h3>
+      <div>
+        <p>
+          Disable the caret.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret</code></li>
+          <li><b>Value</b>: <var title='Display'>Boolean</var></li>
+          <li><b>Default</b>: <code>true</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret</b>="<i>false</i>"&gt;This is Typecadence with caret.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret='false'>
+          This is Typecadence without a caret.
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Caret: Character</h3>
+      <div>
+        <p>
+          The caret character.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret-char</code></li>
+          <li><b>Value</b>: <var title='Character'>String</var></li>
+          <li><b>Default</b>: <code>|</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret-char</b>="<i>_</i>"&gt;This is Typecadence with a custom caret character.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret-char='_'>
+          This is Typecadence with a custom caret character.
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Caret: Color</h3>
+      <div>
+        <p>
+          The caret color.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret-color</code></li>
+          <li><b>Value</b>: <var title='Color'>String</var></li>
+          <li><b>Default</b>: <code>inherit</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret-color</b>="<i>#cc2127</i>"&gt;This is Typecadence with a custom caret color.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret-color='#cc2127'>
+          This is Typecadence with a custom caret color.
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Caret: Blink</h3>
+      <div>
+        <p>
+          Disable the caret's blinking animation.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret-blink</code></li>
+          <li><b>Value</b>: <var title='Blink'>Boolean</var></li>
+          <li><b>Default</b>: <code>true</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret-blink</b>="<i>false</i>"&gt;This is Typecadence without a blinking caret.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret-blink='false'>
+          This is Typecadence without a blinking caret.
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Caret: Blink Speed</h3>
+      <div>
+        <p>
+          The caret blink speed. The value is in milliseconds.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret-blink-speed</code></li>
+          <li><b>Value</b>: <var title='Milliseconds'>Number</var></li>
+          <li><b>Default</b>: <code>500</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret-blink-speed</b>="<i>1000</i>"&gt;This is Typecadence with a slower blinking caret.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret-blink-speed='1000'>
+          This is Typecadence with a slower blinking caret.
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Caret: Remain</h3>
+      <div>
+        <p>
+          The caret can be set to permanently remain at the end of the text.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret-remain</code></li>
+          <li><b>Value</b>: <var title='Remain'>Boolean</var></li>
+          <li><b>Default</b>: <code>false</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret-remain</b>="<i>true</i>"&gt;This is Typecadence with a caret that permanently remains at the end of the text.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret-remain='true'>
+          This is Typecadence with a caret that permanently remains at the end of the text.
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Caret: Remain Timeout</h3>
+      <div>
+        <p>
+          The caret can be set to remain at the end of the text for a specific amount of time. The value is in milliseconds.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret-remain-timeout</code></li>
+          <li><b>Value</b>: <var title='Milliseconds'>Number</var></li>
+          <li><b>Default</b>: <code>0</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret-remain-timeout</b>="<i>5000</i>"&gt;This is Typecadence with a caret that remains at the end of the text for five seconds.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret-remain-timeout='5000'>
+          This is Typecadence with a caret that remains at the end of the text for five seconds.
+        </div>
+      </div>
+    </div>
+  </main>
 </section>
 <script src='https://cdn.jsdelivr.net/npm/typecadence@^1'></script>
 </body>

@@ -9,121 +9,121 @@ $color-orangeLight: #f8b09d;
 $color-white: #fcf7ea;
 
 body {
-	background: $color-greenDarkest;
-	color: $color-white;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 16px;
-	line-height: 1.5;
-	margin: 0;
-	padding: 0;
+  background: $color-greenDarkest;
+  color: $color-white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
 }
 
 a {
-	color: $color-yellow;
-	text-decoration: none;
-	
-	&:hover {
-		text-decoration: underline;
-	}
+  color: $color-yellow;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 @media screen and (max-width: 960px) {
-	header {
-		margin-top: 0 !important;
-		
-		main {
-			img {
-				margin: 0 1em;
-			}
-		}
-	}
+  header {
+    margin-top: 0 !important;
+    
+    main {
+      img {
+        margin: 0 1em;
+      }
+    }
+  }
 }
 
 header,
 section {
-	margin: 3em 0;
-	padding: 1em 0;
-	
-	p {
-		> code {
-			font-style: italic;
-			color: $color-orangeLight;
-		}
-	}
-	
-	main, div {
-		> code {
-			display: block;
-			border: 2px solid rgba($color-greenDarkest, 0.2);
-			background: linear-gradient(122deg, rgba($color-orangeDark, 0.5), rgba($color-orangeDark, 0.2));
-			padding: 1em;
-			overflow: hidden;
-		}
-	}
-	
-	main {
-		margin: 0 auto;
-		max-width: 960px;
-		padding: 0 1em;
-		
-		h1 {
-			font-size: 38px;
-		}
-		
-		h2 {
-			margin-top: 1em;
-			font-size: 30px;
-		}
-		
-		code {
-			b {
-				color: $color-orange;
-			}
-			
-			i {
-				color: $color-yellow;
-			}
-		}
-		
-		div {
-			margin: 0 0 0 2em;
-			
-			var {
-				font-style: normal;
-				cursor: help;
-				border-bottom:1px dotted $color-orangeLight;
-			}
-		}
-		
-		> div {
-			margin: 3em 0;
-		}
-	}
+  margin: 3em 0;
+  padding: 1em 0;
+  
+  p {
+    > code {
+      font-style: italic;
+      color: $color-orangeLight;
+    }
+  }
+  
+  main, div {
+    > code {
+      display: block;
+      border: 2px solid rgba($color-greenDarkest, 0.2);
+      background: linear-gradient(122deg, rgba($color-orangeDark, 0.5), rgba($color-orangeDark, 0.2));
+      padding: 1em;
+      overflow: hidden;
+    }
+  }
+  
+  main {
+    margin: 0 auto;
+    max-width: 960px;
+    padding: 0 1em;
+    
+    h1 {
+      font-size: 38px;
+    }
+    
+    h2 {
+      margin-top: 1em;
+      font-size: 30px;
+    }
+    
+    code {
+      b {
+        color: $color-orange;
+      }
+      
+      i {
+        color: $color-yellow;
+      }
+    }
+    
+    div {
+      margin: 0 0 0 2em;
+      
+      var {
+        font-style: normal;
+        cursor: help;
+        border-bottom:1px dotted $color-orangeLight;
+      }
+    }
+    
+    > div {
+      margin: 3em 0;
+    }
+  }
 }
 
 section {
-	background-color: $color-greenDark;
+  background-color: $color-greenDark;
 }
 
 div.typecadence {
-	font-family: Consolas, monospace;
-	font-size: 24px;
-	line-height: 1.5;
-	margin: 0.75em 0;
+  font-family: Consolas, monospace;
+  font-size: 24px;
+  line-height: 1.5;
+  margin: 0.75em 0;
 }
 
 #demo {
-	background-color: $color-greenDark;
-	overflow:hidden;
-	
-	.typecadence {
-		display: block;
-		border: 2px solid rgba($color-greenDarkest, 0.2);
-		background: rgba($color-orangeDark, 0.5);
-		padding: 1em;
-		overflow: hidden;
-		height: 150px;
-		width:680px;
-		margin: 12px auto;
-	}
+  background-color: $color-greenDark;
+  overflow:hidden;
+  
+  .typecadence {
+    display: block;
+    border: 2px solid rgba($color-greenDarkest, 0.2);
+    background: rgba($color-orangeDark, 0.5);
+    padding: 1em;
+    overflow: hidden;
+    height: 150px;
+    width:680px;
+    margin: 12px auto;
+  }
 }
