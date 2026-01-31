@@ -220,7 +220,7 @@
       data-typecadence-caret-blink-speed='750'
     >Caret</h2>
     <p>
-      If displayed, the caret is a <code>&lt;span&gt;</code> with a class of <code>typecadence-caret</code>.
+      By default, the caret is a <code>&lt;span&gt;</code> with a class of <code>typecadence-caret</code>. The tag, class, and ID of the caret can be customized.
     </p>
     <div>
       <h3>Caret: Display</h3>
@@ -243,6 +243,69 @@
       </div>
     </div>
     
+    <div>
+      <h3>Caret: Tag</h3>
+      <div>
+        <p>
+          The HTML tag used for the caret element.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret-tag</code></li>
+          <li><b>Value</b>: <var title='HTML Tag'>String</var></li>
+          <li><b>Default</b>: <code>span</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret-tag</b>="<i>i</i>"&gt;This is Typecadence with a caret rendered as an italic element.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret-tag='i'>
+          This is Typecadence with a caret rendered as an italic element.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>Caret: Class</h3>
+      <div>
+        <p>
+          An additional CSS class to apply to the caret element. The <code>typecadence-caret</code> class is always applied.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret-class</code></li>
+          <li><b>Value</b>: <var title='CSS Class'>String</var></li>
+          <li><b>Default</b>: <i>none</i></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret-class</b>="<i>my-caret</i>"&gt;This is Typecadence with a custom caret class.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret-class='my-caret'>
+          This is Typecadence with a custom caret class.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>Caret: ID</h3>
+      <div>
+        <p>
+          An ID to apply to the caret element.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-caret-id</code></li>
+          <li><b>Value</b>: <var title='Element ID'>String</var></li>
+          <li><b>Default</b>: <i>none</i></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-caret-id</b>="<i>my-caret-id</i>"&gt;This is Typecadence with a custom caret ID.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-caret-id='my-caret-id'>
+          This is Typecadence with a custom caret ID.
+        </div>
+      </div>
+    </div>
+
     <div>
       <h3>Caret: Character</h3>
       <div>
