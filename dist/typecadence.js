@@ -46,6 +46,9 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                 caretBold: true,
                 caretBlink: true,
                 caretBlinkSpeed: 500,
+                caretTag: 'span',
+                caretClass: '',
+                caretId: '',
                 caretRemain: false,
                 caretRemainTimeout: null,
                 mistakes: 5,
@@ -223,8 +226,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             }
         }
         animateText(element) {
-            var _a;
             return __awaiter(this, void 0, void 0, function* () {
+                var _a;
                 const animationSettings = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseAnimationSettings).call(this, element);
                 // Define text content
                 const text = ((_a = element.textContent) === null || _a === void 0 ? void 0 : _a.trim()) || '';
@@ -335,6 +338,9 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caret;
         const caretChar = element.getAttribute("data-typecadence-caret-char") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretChar;
         const caretColor = element.getAttribute("data-typecadence-caret-color") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretColor;
+        const caretTag = element.getAttribute("data-typecadence-caret-tag") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretTag;
+        const caretClass = element.getAttribute("data-typecadence-caret-class") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretClass;
+        const caretId = element.getAttribute("data-typecadence-caret-id") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretId;
         const caretBoldAttribute = (_c = element.getAttribute("data-typecadence-caret-bold")) === null || _c === void 0 ? void 0 : _c.toLowerCase();
         const caretBold = caretBoldAttribute === "true" ? true :
             caretBoldAttribute === "false" ? false :
@@ -365,6 +371,9 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             minSpeed,
             maxSpeed,
             caret,
+            caretTag,
+            caretClass,
+            caretId,
             caretChar,
             caretColor,
             caretBold,
@@ -396,8 +405,17 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     }, _Typecadence_getTypingSpeed = function _Typecadence_getTypingSpeed(minSpeed, maxSpeed) {
         return Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
     }, _Typecadence_createCaret = function _Typecadence_createCaret(animationSettings) {
-        const caret = document.createElement("span");
+        const caret = document.createElement(animationSettings.caretTag);
         caret.classList.add("typecadence-caret");
+        if (animationSettings.caretClass) {
+            for (const cls of animationSettings.caretClass.split(/\s+/)) {
+                if (cls)
+                    caret.classList.add(cls);
+            }
+        }
+        if (animationSettings.caretId) {
+            caret.id = animationSettings.caretId;
+        }
         caret.textContent = animationSettings.caretChar;
         caret.style.color = animationSettings.caretColor;
         caret.style.fontWeight = animationSettings.caretBold ? "bold" : "normal";

@@ -26,6 +26,9 @@ declare var define: any;
       caretBold: true,
       caretBlink: true,
       caretBlinkSpeed: 500,
+      caretTag: 'span',
+      caretClass: '',
+      caretId: '',
       caretRemain: false,
       caretRemainTimeout: null,
       mistakes: 5,
@@ -227,6 +230,9 @@ declare var define: any;
           this.#defaultSettings.caret;
       const caretChar = element.getAttribute("data-typecadence-caret-char") || this.#defaultSettings.caretChar;
       const caretColor = element.getAttribute("data-typecadence-caret-color") || this.#defaultSettings.caretColor;
+      const caretTag = element.getAttribute("data-typecadence-caret-tag") || this.#defaultSettings.caretTag;
+      const caretClass = element.getAttribute("data-typecadence-caret-class") || this.#defaultSettings.caretClass;
+      const caretId = element.getAttribute("data-typecadence-caret-id") || this.#defaultSettings.caretId;
       const caretBoldAttribute = element.getAttribute("data-typecadence-caret-bold")?.toLowerCase();
       const caretBold = caretBoldAttribute === "true" ? true :
         caretBoldAttribute === "false" ? false :
@@ -258,6 +264,9 @@ declare var define: any;
         minSpeed,
         maxSpeed,
         caret,
+        caretTag,
+        caretClass,
+        caretId,
         caretChar,
         caretColor,
         caretBold,
@@ -296,8 +305,16 @@ declare var define: any;
     }
 
     #createCaret(animationSettings: AnimationSettings): HTMLElement {
-      const caret = document.createElement("span");
+      const caret = document.createElement(animationSettings.caretTag);
       caret.classList.add("typecadence-caret");
+      if (animationSettings.caretClass) {
+        for (const cls of animationSettings.caretClass.split(/\s+/)) {
+          if (cls) caret.classList.add(cls);
+        }
+      }
+      if (animationSettings.caretId) {
+        caret.id = animationSettings.caretId;
+      }
       caret.textContent = animationSettings.caretChar;
       caret.style.color = animationSettings.caretColor;
       caret.style.fontWeight = animationSettings.caretBold ? "bold" : "normal";
@@ -442,6 +459,9 @@ declare var define: any;
     minSpeed: number;
     maxSpeed: number;
     caret: boolean;
+    caretTag: string;
+    caretClass: string;
+    caretId: string;
     caretChar: string;
     caretColor: string;
     caretBold: boolean;
