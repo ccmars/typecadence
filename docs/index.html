@@ -129,6 +129,50 @@
         </div>
       </div>
     </div>
+
+    <div>
+      <h3>Typing: Space Speed</h3>
+      <div>
+        <p>
+          The typing speed for space characters. The value is a single number of milliseconds or a range in milliseconds separated by a comma. If not specified, spaces are typed at the normal typing speed.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-space-speed</code></li>
+          <li><b>Value</b>: <var title='Milliseconds'>Number</var>[,<var title='Milliseconds'>Number</var>]</li>
+          <li><b>Default</b>: <i>Same as typing speed</i></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" data-typecadence-speed="30,50" <b>data-typecadence-space-speed</b>="<i>500</i>"&gt;This is Typecadence with a slow pause between words.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-speed='30,50'
+            data-typecadence-space-speed='500'>
+          This is Typecadence with a slow pause between words.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>Typing: Backspace Speed</h3>
+      <div>
+        <p>
+          The speed at which mistakes are backspaced. The value is a single number of milliseconds or a range in milliseconds separated by a comma. If not specified, backspaces use the normal typing speed.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-backspace-speed</code></li>
+          <li><b>Value</b>: <var title='Milliseconds'>Number</var>[,<var title='Milliseconds'>Number</var>]</li>
+          <li><b>Default</b>: <i>Same as typing speed</i></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" data-typecadence-mistakes="15" <b>data-typecadence-backspace-speed</b>="<i>30</i>"&gt;This is Typecadence with rapid mistake correction.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-mistakes='15'
+            data-typecadence-backspace-speed='30'>
+          This is Typecadence with rapid mistake correction.
+        </div>
+      </div>
+    </div>
   </main>
 </section>
 
