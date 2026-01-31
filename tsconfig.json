@@ -1,15 +1,22 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "ESNext",
 		"target": "es6",
-		"sourceMap": true,
 		"outDir": "dist",
+		"declaration": true,
+		"sourceMap": true,
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"lib": ["DOM", "ES6"],
+		"moduleResolution": "node"
 	},
 	"include": [
-		"src/**/*.ts",    // Include all TypeScript files in the "src" directory and its subdirectories
-		"tests/**/*.ts"   // Include all TypeScript files in the "tests" directory and its subdirectories
+		"src/**/*.ts"
 	],
 	"exclude": [
-		"node_modules"
+		"node_modules",
+		"tests"
 	]
 }

@@ -1,14 +1,18 @@
 {
 	"name": "typecadence",
 	"description": "Typing animation library that automatically mimics the flaws a human typist",
-	"version": "1.0.8",
+	"version": "2.0.0",
 	"license": "CC0-1.0",
 	"author": {
 		"name": "Cole Marshall",
 		"url": "https://colemarshall.net/"
 	},
 	"homepage": "https://typecadence.colemarshall.net/",
-	"main": "dist/typecadence.js",
+	"main": "dist/index.js",
+	"module": "dist/index.js",
+	"browser": "dist/typecadence.umd.js",
+	"unpkg": "dist/typecadence.umd.js",
+	"types": "dist/index.d.ts",
 	"repository": "github:ccmars/typecadence",
 	"bugs": {
 		"url": "https://github.com/ccmars/typecadence/issues"
@@ -23,8 +27,19 @@
 			"url": "https://github.com/sponsors/ccmars"
 		}
 	],
+	"files": [
+		"dist"
+	],
 	"scripts": {
+		"build": "npm run build:esm && npm run build:umd",
+		"build:esm": "tsc",
+		"build:umd": "tsc --project tsconfig.umd.json",
+		"dev": "tsc --watch",
+		"prepublishOnly": "npm run build",
 		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"devDependencies": {
+		"typescript": "^5.0.0"
 	},
 	"keywords": [
 		"typing",

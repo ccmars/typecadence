@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Typecadence Test Page</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 2rem; line-height: 1.6; }
+      h1 { color: #cc2127; margin-bottom: 0.5rem; }
+      h2 { color: #e94560; margin: 2rem 0 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+      .test-card { background: #16213e; border: 1px solid #0f3460; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+      .test-card h3 { color: #e94560; margin-bottom: 0.25rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+      .test-card p.desc { color: #888; font-size: 0.85rem; margin-bottom: 1rem; }
+      .test-card .output { font-size: 1.2rem; min-height: 2rem; padding: 0.5rem; background: #0a0a1a; border-radius: 4px; }
+      .subtitle { color: #888; margin-bottom: 2rem; }
+      button { background: #e94560; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem; font-size: 0.9rem; }
+      button:hover { background: #cc2127; }
+    </style>
+  </head>
+  <body>
+    <h1>Typecadence Test Page</h1>
+    <p class="subtitle">Testing animations for issue fixes and new features. Reload to replay all.</p>
+
+    <h2>Baseline</h2>
+
+    <div class="test-card">
+      <h3>Default settings</h3>
+      <p class="desc">All defaults: speed 50-100ms, 5% mistakes, caret on</p>
+      <div class="output">
+        <span class="typecadence">The quick brown fox jumps over the lazy dog.</span>
+      </div>
+    </div>
+
+    <div class="test-card">
+      <h3>Fast typing with mistakes</h3>
+      <p class="desc">Speed 15-100ms, 8% mistakes, 2 present before correction, red caret remains 5s</p>
+      <div class="output">
+        <span class="typecadence"
+          data-typecadence-speed="15,100"
+          data-typecadence-caret-color="#cc2127"
+          data-typecadence-caret-remain="true"
+          data-typecadence-caret-remain-timeout="5000"
+          data-typecadence-mistakes="8"
+          data-typecadence-mistakes-present="2"
+        >Typecadence simulates natural human typing, including speed variations and mistakes.</span>
+      </div>
+    </div>
+
+    <div class="test-card">
+      <h3>No mistakes, no caret</h3>
+      <p class="desc">Clean typing, speed 30-60ms, caret disabled</p>
+      <div class="output">
+        <span class="typecadence"
+          data-typecadence-speed="30,60"
+          data-typecadence-caret="false"
+          data-typecadence-mistakes="0"
+        >Perfectly clean typing with no caret visible.</span>
+      </div>
+    </div>
+
+    <div class="test-card">
+      <h3>Slow deliberate typing</h3>
+      <p class="desc">Speed 150-300ms, custom caret underscore, no blink</p>
+      <div class="output">
+        <span class="typecadence"
+          data-typecadence-speed="150,300"
+          data-typecadence-caret-char="_"
+          data-typecadence-caret-blink="false"
+          data-typecadence-caret-color="#4ecca3"
+          data-typecadence-mistakes="3"
+        >Slow and steady wins the race.</span>
+      </div>
+    </div>
+
+    <div class="test-card">
+      <h3>Delayed start</h3>
+      <p class="desc">2 second delay before typing begins</p>
+      <div class="output">
+        <span class="typecadence"
+          data-typecadence-delay="2000"
+          data-typecadence-speed="40,80"
+        >This text waited 2 seconds before starting.</span>
+      </div>
+    </div>
+
+    <h2>Issue #8: Space/Backspace Speed</h2>
+
+    <div class="test-card">
+      <h3>Slow spaces (500ms pause between words)</h3>
+      <p class="desc">data-typecadence-space-speed="500" — typing is fast but spaces are slow</p>
+      <div class="output">
+        <span class="typecadence"
+          data-typecadence-speed="30,50"
+          data-typecadence-space-speed="500"
+          data-typecadence-mistakes="0"
+        >Each word should have a noticeable pause between it.</span>
+      </div>
+    </div>
+
+    <div class="test-card">
+      <h3>Fast backspace (30ms correction speed)</h3>
+      <p class="desc">data-typecadence-backspace-speed="30" with 15% mistakes — corrections are rapid</p>
+      <div class="output">
+        <span class="typecadence"
+          data-typecadence-speed="60,120"
+          data-typecadence-backspace-speed="30"
+          data-typecadence-mistakes="15"
+          data-typecadence-mistakes-present="2"
+        >Mistakes will be corrected very quickly compared to normal typing speed.</span>
+      </div>
+    </div>
+
+    <div class="test-card">
+      <h3>Both: slow spaces + fast backspace</h3>
+      <p class="desc">data-typecadence-space-speed="400,600" data-typecadence-backspace-speed="20,40"</p>
+      <div class="output">
+        <span class="typecadence"
+          data-typecadence-speed="50,80"
+          data-typecadence-space-speed="400,600"
+          data-typecadence-backspace-speed="20,40"
+          data-typecadence-mistakes="10"
+          data-typecadence-mistakes-present="2"
+        >Slow pauses between words but rapid corrections when mistakes happen.</span>
+      </div>
+    </div>
+
+    <h2>Issue #14: Caret Tag Options (TODO)</h2>
+
+    <div class="test-card">
+      <h3>Custom caret tag, class, and ID</h3>
+      <p class="desc">Will test caret-tag, caret-class, caret-id once implemented</p>
+      <div class="output">
+        <span class="typecadence"
+          data-typecadence-speed="40,80"
+          data-typecadence-caret-color="#f0a500"
+        >This caret should support custom tag, class, and ID.</span>
+      </div>
+    </div>
+
+    <h2>Issue #7: Callback (TODO)</h2>
+
+    <div class="test-card">
+      <h3>Animation complete callback</h3>
+      <p class="desc">Will test callback functionality once implemented</p>
+      <div class="output">
+        <span id="callback-test" class="typecadence"
+          data-typecadence-speed="30,60"
+          data-typecadence-mistakes="0"
+        >When this finishes, a callback should fire.</span>
+      </div>
+      <div id="callback-result" style="color: #4ecca3; margin-top: 0.5rem; font-size: 0.85rem;"></div>
+    </div>
+
+    <script type="module">
+      import './dist/typecadence.js';
+    </script>
+  </body>
+</html>

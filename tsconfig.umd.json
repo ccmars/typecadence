@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "amd",
+    "outFile": "dist/typecadence.umd.js",
+    "declaration": false,
+    "sourceMap": false
+  },
+  "files": [
+    "src/typecadence_keyboardLayouts.ts",
+    "src/typecadence.ts"
+  ]
+}
