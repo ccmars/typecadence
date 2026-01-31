@@ -57,6 +57,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                 backspaceMaxSpeed: null,
                 mistakes: 5,
                 mistakesPresent: 1,
+                callback: '',
                 keyboard: KeyboardLayout.QWERTY,
             });
             _Typecadence_adjacentMapping.set(this, {
@@ -322,6 +323,18 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                         }
                     }
                 }
+                // Dispatch completion event
+                element.dispatchEvent(new CustomEvent('typecadence:complete', {
+                    bubbles: true,
+                    detail: { element }
+                }));
+                // Call named global callback if specified
+                if (animationSettings.callback) {
+                    const fn = window[animationSettings.callback];
+                    if (typeof fn === 'function') {
+                        fn(element);
+                    }
+                }
             });
         }
     }
@@ -380,6 +393,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
         const mistakes = (mistakesPercent !== null) ? mistakesPercent : __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakes;
         const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
         const mistakesPresent = mistakesPresentAttribute < 0 || isNaN(mistakesPresentAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakesPresent : Math.max(1, mistakesPresentAttribute);
+        const callback = element.getAttribute("data-typecadence-callback") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").callback;
         const keyboardAttribute = (_f = element.getAttribute("data-typecadence-keyboard")) === null || _f === void 0 ? void 0 : _f.toLowerCase();
         const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
             keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
@@ -404,6 +418,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             caretBlink,
             caretRemain,
             caretRemainTimeout,
+            callback,
             mistakes,
             mistakesPresent,
             keyboard

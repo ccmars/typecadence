@@ -37,6 +37,7 @@ declare var define: any;
       backspaceMaxSpeed: null,
       mistakes: 5,
       mistakesPresent: 1,
+      callback: '',
       keyboard: KeyboardLayout.QWERTY,
     };
     readonly #adjacentMapping = {
@@ -272,6 +273,7 @@ declare var define: any;
       const mistakes = (mistakesPercent !== null) ? mistakesPercent : this.#defaultSettings.mistakes;
       const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
       const mistakesPresent = mistakesPresentAttribute < 0 || isNaN(mistakesPresentAttribute) ? this.#defaultSettings.mistakesPresent : Math.max(1, mistakesPresentAttribute);
+      const callback = element.getAttribute("data-typecadence-callback") || this.#defaultSettings.callback;
       const keyboardAttribute = element.getAttribute("data-typecadence-keyboard")?.toLowerCase();
       const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
         keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
@@ -297,6 +299,7 @@ declare var define: any;
         caretBlink,
         caretRemain,
         caretRemainTimeout,
+        callback,
         mistakes,
         mistakesPresent,
         keyboard
@@ -476,6 +479,20 @@ declare var define: any;
           }
         }
       }
+
+      // Dispatch completion event
+      element.dispatchEvent(new CustomEvent('typecadence:complete', {
+        bubbles: true,
+        detail: { element }
+      }));
+
+      // Call named global callback if specified
+      if (animationSettings.callback) {
+        const fn = (window as any)[animationSettings.callback];
+        if (typeof fn === 'function') {
+          fn(element);
+        }
+      }
     }
   }
 
@@ -499,6 +516,7 @@ declare var define: any;
     caretBlink: boolean;
     caretRemain: boolean;
     caretRemainTimeout: number;
+    callback: string;
     mistakes: number;
     mistakesPresent: number;
     keyboard: KeyboardLayout
