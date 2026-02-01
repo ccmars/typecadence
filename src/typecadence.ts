@@ -407,6 +407,7 @@ declare var define: any;
 
       let mistakeBuffer: number[] = [];
       let currentIndex = 0;
+      let justCorrected = false;
 
       // Type animation
       while (currentIndex < text.length || mistakeBuffer.length > 0) {
@@ -427,11 +428,13 @@ declare var define: any;
           }
 
           mistakeBuffer = [];
+          justCorrected = true;
         }
 
         // Type next character
         const char = text[currentIndex];
-        const isMistake = this.#isMistake(animationSettings.mistakes);
+        const isMistake = !justCorrected && this.#isMistake(animationSettings.mistakes);
+        justCorrected = false;
         if (isMistake) {
           const incorrectChar = this.#incorrectChar(char, animationSettings.keyboard);
           const charNode = document.createTextNode(incorrectChar);
