@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-02-01
+
+### Added
+
+- Unit test suite with 41 tests covering constructor, IntersectionObserver, typing, caret, settings parsing, mistakes, events, callbacks, and edge cases
+
+### Fixed
+
+- Infinite loop when `mistakes` is set to 100% — after correcting a mistake, the retry now always types the correct character
+
 ## [1.1.0] - 2026-01-31
 
 ### Added
@@ -83,7 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - QWERTY, QWERTZ, and AZERTY keyboard layout support for adjacent character mistakes
 - IntersectionObserver-based animation trigger on element visibility
 
-[1.1.0]: https://github.com/ccmars/typecadence/compare/v1.0.8...HEAD
+[1.1.1]: https://github.com/ccmars/typecadence/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ccmars/typecadence/compare/v1.0.8...v1.1.0
 [1.0.8]: https://github.com/ccmars/typecadence/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/ccmars/typecadence/compare/v1.0.6...v1.0.7
 [1.0.6]: https://github.com/ccmars/typecadence/compare/v1.0.5...v1.0.6
