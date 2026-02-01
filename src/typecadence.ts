@@ -31,6 +31,10 @@ declare var define: any;
       caretId: '',
       caretRemain: false,
       caretRemainTimeout: null,
+      spaceMinSpeed: null,
+      spaceMaxSpeed: null,
+      backspaceMinSpeed: null,
+      backspaceMaxSpeed: null,
       mistakes: 5,
       mistakesPresent: 1,
       keyboard: KeyboardLayout.QWERTY,
@@ -224,6 +228,21 @@ declare var define: any;
       const delayAttribute = parseInt(element.getAttribute("data-typecadence-delay"));
       const delay = isNaN(delayAttribute) ? this.#defaultSettings.delay : delayAttribute;
       const [minSpeed, maxSpeed] = this.#parseSpeedAttribute(element.getAttribute("data-typecadence-speed"));
+
+      const spaceSpeedAttr = element.getAttribute("data-typecadence-space-speed");
+      const [spaceMinSpeedParsed, spaceMaxSpeedParsed] = spaceSpeedAttr
+        ? this.#parseSpeedAttribute(spaceSpeedAttr)
+        : [NaN, NaN];
+      const spaceMinSpeed = isNaN(spaceMinSpeedParsed) ? this.#defaultSettings.spaceMinSpeed : spaceMinSpeedParsed;
+      const spaceMaxSpeed = isNaN(spaceMaxSpeedParsed) ? this.#defaultSettings.spaceMaxSpeed : spaceMaxSpeedParsed;
+
+      const backspaceSpeedAttr = element.getAttribute("data-typecadence-backspace-speed");
+      const [backspaceMinSpeedParsed, backspaceMaxSpeedParsed] = backspaceSpeedAttr
+        ? this.#parseSpeedAttribute(backspaceSpeedAttr)
+        : [NaN, NaN];
+      const backspaceMinSpeed = isNaN(backspaceMinSpeedParsed) ? this.#defaultSettings.backspaceMinSpeed : backspaceMinSpeedParsed;
+      const backspaceMaxSpeed = isNaN(backspaceMaxSpeedParsed) ? this.#defaultSettings.backspaceMaxSpeed : backspaceMaxSpeedParsed;
+
       const displayCaretAttribute = element.getAttribute("data-typecadence-caret")?.toLowerCase();
       const caret = displayCaretAttribute === "true" ? true :
         displayCaretAttribute === "false" ? false :
@@ -263,6 +282,10 @@ declare var define: any;
         delay,
         minSpeed,
         maxSpeed,
+        spaceMinSpeed,
+        spaceMaxSpeed,
+        backspaceMinSpeed,
+        backspaceMaxSpeed,
         caret,
         caretTag,
         caretClass,
@@ -396,7 +419,7 @@ declare var define: any;
           const stepsToGoBack = currentIndex - mistakeIndex;
 
           for (let i = 0; i < stepsToGoBack; i++) {
-            await this.#backspace(element, caret, animationSettings.minSpeed, animationSettings.maxSpeed);
+            await this.#backspace(element, caret, animationSettings.backspaceMinSpeed ?? animationSettings.minSpeed, animationSettings.backspaceMaxSpeed ?? animationSettings.maxSpeed);
             currentIndex--;
           }
 
@@ -426,7 +449,10 @@ declare var define: any;
           }
         }
 
-        const typingSpeed = this.#getTypingSpeed(animationSettings.minSpeed, animationSettings.maxSpeed);
+        const isSpace = char === ' ';
+        const typingMinSpeed = isSpace ? (animationSettings.spaceMinSpeed ?? animationSettings.minSpeed) : animationSettings.minSpeed;
+        const typingMaxSpeed = isSpace ? (animationSettings.spaceMaxSpeed ?? animationSettings.maxSpeed) : animationSettings.maxSpeed;
+        const typingSpeed = this.#getTypingSpeed(typingMinSpeed, typingMaxSpeed);
 
         await new Promise((resolve) => setTimeout(resolve, typingSpeed));
         currentIndex++;
@@ -458,6 +484,10 @@ declare var define: any;
     delay: number;
     minSpeed: number;
     maxSpeed: number;
+    spaceMinSpeed: number | null;
+    spaceMaxSpeed: number | null;
+    backspaceMinSpeed: number | null;
+    backspaceMaxSpeed: number | null;
     caret: boolean;
     caretTag: string;
     caretClass: string;
