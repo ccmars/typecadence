@@ -129,6 +129,49 @@
         </div>
       </div>
     </div>
+
+    <div>
+      <h3>Typing: Space Speed</h3>
+      <div>
+        <p>
+          A separate typing speed for space characters. When set, spaces are typed at this speed instead of the general typing speed. When not set, spaces use the general typing speed. The value format is the same as the general speed attribute.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-space-speed</code></li>
+          <li><b>Value</b>: <var title='Milliseconds'>Number</var>[,<var title='Milliseconds'>Number</var>]</li>
+          <li><b>Default</b>: <i>inherits from speed</i></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-space-speed</b>="<i>500,800</i>"&gt;This is Typecadence with a slower space speed.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-space-speed='500,800'>
+          This is Typecadence with a slower space speed.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>Typing: Backspace Speed</h3>
+      <div>
+        <p>
+          A separate speed for backspace corrections. When set, mistakes are corrected at this speed instead of the general typing speed. When not set, backspacing uses the general typing speed. The value format is the same as the general speed attribute.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-backspace-speed</code></li>
+          <li><b>Value</b>: <var title='Milliseconds'>Number</var>[,<var title='Milliseconds'>Number</var>]</li>
+          <li><b>Default</b>: <i>inherits from speed</i></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" data-typecadence-mistakes="25" <b>data-typecadence-backspace-speed</b>="<i>20,40</i>"&gt;This is Typecadence with fast backspace corrections.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-mistakes='25'
+            data-typecadence-backspace-speed='20,40'>
+          This is Typecadence with fast backspace corrections.
+        </div>
+      </div>
+    </div>
   </main>
 </section>
 

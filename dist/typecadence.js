@@ -51,6 +51,10 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                 caretId: '',
                 caretRemain: false,
                 caretRemainTimeout: null,
+                spaceMinSpeed: null,
+                spaceMaxSpeed: null,
+                backspaceMinSpeed: null,
+                backspaceMaxSpeed: null,
                 mistakes: 5,
                 mistakesPresent: 1,
                 keyboard: KeyboardLayout.QWERTY,
@@ -227,7 +231,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
         }
         animateText(element) {
             return __awaiter(this, void 0, void 0, function* () {
-                var _a;
+                var _a, _b, _c, _d, _e;
                 const animationSettings = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseAnimationSettings).call(this, element);
                 // Define text content
                 const text = ((_a = element.textContent) === null || _a === void 0 ? void 0 : _a.trim()) || '';
@@ -262,7 +266,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                         const mistakeIndex = mistakeBuffer[0];
                         const stepsToGoBack = currentIndex - mistakeIndex;
                         for (let i = 0; i < stepsToGoBack; i++) {
-                            yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, animationSettings.minSpeed, animationSettings.maxSpeed);
+                            yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, (_b = animationSettings.backspaceMinSpeed) !== null && _b !== void 0 ? _b : animationSettings.minSpeed, (_c = animationSettings.backspaceMaxSpeed) !== null && _c !== void 0 ? _c : animationSettings.maxSpeed);
                             currentIndex--;
                         }
                         mistakeBuffer = [];
@@ -292,7 +296,10 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                             element.appendChild(charNode);
                         }
                     }
-                    const typingSpeed = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, animationSettings.minSpeed, animationSettings.maxSpeed);
+                    const isSpace = char === ' ';
+                    const typingMinSpeed = isSpace ? ((_d = animationSettings.spaceMinSpeed) !== null && _d !== void 0 ? _d : animationSettings.minSpeed) : animationSettings.minSpeed;
+                    const typingMaxSpeed = isSpace ? ((_e = animationSettings.spaceMaxSpeed) !== null && _e !== void 0 ? _e : animationSettings.maxSpeed) : animationSettings.maxSpeed;
+                    const typingSpeed = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, typingMinSpeed, typingMaxSpeed);
                     yield new Promise((resolve) => setTimeout(resolve, typingSpeed));
                     currentIndex++;
                 }
@@ -332,6 +339,18 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
         const delayAttribute = parseInt(element.getAttribute("data-typecadence-delay"));
         const delay = isNaN(delayAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").delay : delayAttribute;
         const [minSpeed, maxSpeed] = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseSpeedAttribute).call(this, element.getAttribute("data-typecadence-speed"));
+        const spaceSpeedAttr = element.getAttribute("data-typecadence-space-speed");
+        const [spaceMinSpeedParsed, spaceMaxSpeedParsed] = spaceSpeedAttr
+            ? __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseSpeedAttribute).call(this, spaceSpeedAttr)
+            : [NaN, NaN];
+        const spaceMinSpeed = isNaN(spaceMinSpeedParsed) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").spaceMinSpeed : spaceMinSpeedParsed;
+        const spaceMaxSpeed = isNaN(spaceMaxSpeedParsed) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").spaceMaxSpeed : spaceMaxSpeedParsed;
+        const backspaceSpeedAttr = element.getAttribute("data-typecadence-backspace-speed");
+        const [backspaceMinSpeedParsed, backspaceMaxSpeedParsed] = backspaceSpeedAttr
+            ? __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseSpeedAttribute).call(this, backspaceSpeedAttr)
+            : [NaN, NaN];
+        const backspaceMinSpeed = isNaN(backspaceMinSpeedParsed) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").backspaceMinSpeed : backspaceMinSpeedParsed;
+        const backspaceMaxSpeed = isNaN(backspaceMaxSpeedParsed) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").backspaceMaxSpeed : backspaceMaxSpeedParsed;
         const displayCaretAttribute = (_b = element.getAttribute("data-typecadence-caret")) === null || _b === void 0 ? void 0 : _b.toLowerCase();
         const caret = displayCaretAttribute === "true" ? true :
             displayCaretAttribute === "false" ? false :
@@ -370,6 +389,10 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             delay,
             minSpeed,
             maxSpeed,
+            spaceMinSpeed,
+            spaceMaxSpeed,
+            backspaceMinSpeed,
+            backspaceMaxSpeed,
             caret,
             caretTag,
             caretClass,
