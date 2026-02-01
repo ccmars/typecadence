@@ -355,6 +355,8 @@ describe('Caret behavior', () => {
   test('caret remains visible when caretRemain is true', async () => {
     const el = createElement('Hi', {
       'data-typecadence-caret-remain': 'true',
+      'data-typecadence-caret-blink': 'true',
+      'data-typecadence-caret-blink-speed': '100',
       'data-typecadence-mistakes': '0',
     });
     const tc = new Typecadence();
@@ -362,8 +364,10 @@ describe('Caret behavior', () => {
     await drainAnimation(tc.animateText(el));
 
     const caret = el.querySelector('.typecadence-caret') as HTMLElement;
-    // caretRemain=true means the blink interval keeps running (not forced hidden)
-    expect(caret.style.visibility).not.toBe('');
+    // Blink interval should still be running after animation completes
+    const visibilityAfterAnimation = caret.style.visibility;
+    jest.advanceTimersByTime(100);
+    expect(caret.style.visibility).not.toBe(visibilityAfterAnimation);
   });
 
   test('caret hides after caretRemainTimeout', async () => {
@@ -569,6 +573,19 @@ describe('Mistake behavior', () => {
     await drainAnimation(tc.animateText(el));
 
     expect(getVisibleText(el)).toBe('abc');
+  });
+
+  test('100% mistakes still completes (no infinite loop)', async () => {
+    const el = createElement('Hi', {
+      'data-typecadence-mistakes': '100',
+      'data-typecadence-mistakes-present': '1',
+      'data-typecadence-caret': 'false',
+    });
+    const tc = new Typecadence();
+
+    await drainAnimation(tc.animateText(el));
+
+    expect(getVisibleText(el)).toBe('Hi');
   });
 
   test('preserves case of incorrect characters', async () => {
