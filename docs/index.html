@@ -476,6 +476,68 @@
     </div>
   </main>
 </section>
+
+<section>
+  <main>
+    <h2 class='typecadence'
+      data-typecadence-speed='25'
+      data-typecadence-caret-remain='true'
+      data-typecadence-caret-color='#cc2127'
+      data-typecadence-caret-char='_'
+      data-typecadence-mistakes='0'
+      data-typecadence-caret-blink-speed='750'
+    >Callback</h2>
+
+    <div>
+      <h3>Callback: Function</h3>
+      <div>
+        <p>
+          The name of a global function to call when the animation is complete. The function receives the animated element as its argument.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-callback</code></li>
+          <li><b>Value</b>: <var title='Function Name'>String</var></li>
+          <li><b>Default</b>: <i>none</i></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-callback</b>="<i>onTypingComplete</i>"&gt;This animation will call a function when complete.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-callback='onTypingComplete'
+            id='callback-demo'>
+          This animation will call a function when complete.
+        </div>
+        <p id='callback-result'></p>
+      </div>
+    </div>
+
+    <div>
+      <h3>Callback: Event</h3>
+      <div>
+        <p>
+          Every animated element dispatches a <code>typecadence:complete</code> event when the animation finishes. The event bubbles and includes the element in <code>event.detail.element</code>.
+        </p>
+        <code>
+          document.querySelector('.typecadence')<br>&nbsp;&nbsp;.addEventListener('typecadence:complete', (e) => {<br>&nbsp;&nbsp;&nbsp;&nbsp;console.log('Typing finished!', e.detail.element);<br>&nbsp;&nbsp;});
+        </code>
+        <div class='typecadence' id='event-demo'>
+          This animation will fire an event when complete.
+        </div>
+        <p id='event-result'></p>
+      </div>
+    </div>
+  </main>
+</section>
+<script>
+  function onTypingComplete(element) {
+    document.getElementById('callback-result').textContent = 'Callback fired! Animation complete.';
+    document.getElementById('callback-result').style.color = '#4ecca3';
+  }
+  document.getElementById('event-demo').addEventListener('typecadence:complete', function() {
+    document.getElementById('event-result').textContent = 'Event fired! Animation complete.';
+    document.getElementById('event-result').style.color = '#4ecca3';
+  });
+</script>
 <script src='https://cdn.jsdelivr.net/npm/typecadence@^1'></script>
 </body>
 </html>
