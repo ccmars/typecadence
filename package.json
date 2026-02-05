@@ -9,7 +9,10 @@
 	},
 	"homepage": "https://typecadence.colemarshall.net/",
 	"main": "dist/typecadence.js",
-	"repository": "github:ccmars/typecadence",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ccmars/typecadence.git"
+	},
 	"bugs": {
 		"url": "https://github.com/ccmars/typecadence/issues"
 	},
