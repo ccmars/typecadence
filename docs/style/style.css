@@ -92,6 +92,24 @@ div.typecadence {
   margin: 0.75em 0;
 }
 
+button {
+  background: transparent;
+  color: #fec909;
+  border: 1px solid #fec909;
+  padding: 0.4em 1.6em;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+button:hover {
+  background: #fec909;
+  color: #0d1f27;
+}
+
 #demo {
   background-color: #04423b;
   overflow: hidden;

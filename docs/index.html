@@ -23,9 +23,10 @@
     <code>
       &lt;span <b>class</b>="<i>typecadence</i>"&gt;This is Typecadence with its default settings.&lt;/span&gt;
     </code>
-    <div class='typecadence'>
+    <div class='typecadence' id='demo-default'>
       This is Typecadence with its default settings.
     </div>
+    <p><button onclick="Typecadence.restart('#demo-default')">Restart</button></p>
   </main>
 </header>
 
@@ -103,12 +104,14 @@
           &lt;span class="typecadence" <b>data-typecadence-speed</b>="<i>200,1400</i>"&gt;This is Typecadence with a custom speed.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-speed='200,1400'>
+            data-typecadence-speed='200,1400'
+            id='demo-speed'>
           This is Typecadence with a custom speed.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-speed')">Restart</button></p>
       </div>
     </div>
-    
+
     <div>
       <h3>Typing: Delay</h3>
       <div>
@@ -124,9 +127,11 @@
           &lt;span class="typecadence" <b>data-typecadence-delay</b>="<i>3000</i>"&gt;This is Typecadence with a three-second start delay.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-delay='3000'>
+            data-typecadence-delay='3000'
+            id='demo-delay'>
           This is Typecadence with a three-second start delay.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-delay')">Restart</button></p>
       </div>
     </div>
 
@@ -145,9 +150,11 @@
           &lt;span class="typecadence" <b>data-typecadence-space-speed</b>="<i>500,800</i>"&gt;This is Typecadence with a slower space speed.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-space-speed='500,800'>
+            data-typecadence-space-speed='500,800'
+            id='demo-space-speed'>
           This is Typecadence with a slower space speed.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-space-speed')">Restart</button></p>
       </div>
     </div>
 
@@ -167,9 +174,11 @@
         </code>
         <div class='typecadence'
             data-typecadence-mistakes='25'
-            data-typecadence-backspace-speed='20,40'>
+            data-typecadence-backspace-speed='20,40'
+            id='demo-backspace-speed'>
           This is Typecadence with fast backspace corrections.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-backspace-speed')">Restart</button></p>
       </div>
     </div>
   </main>
@@ -201,12 +210,14 @@
           &lt;span class="typecadence" <b>data-typecadence-mistakes</b>="<i>25</i>"&gt;This is Typecadence with a 25% chance of a mistake being made with each keystroke.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-mistakes='25'>
+            data-typecadence-mistakes='25'
+            id='demo-mistakes'>
           This is Typecadence with a 25% chance of a mistake being made with each keystroke.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-mistakes')">Restart</button></p>
       </div>
     </div>
-    
+
     <div>
       <h3>Mistakes: Present</h3>
       <div>
@@ -222,12 +233,14 @@
           &lt;span class="typecadence" <b>data-typecadence-mistakes-present</b>="<i>3</i>"&gt;This is Typecadence with a maximum of three mistakes present before backspacing to correct the earliest mistake.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-mistakes-present='3'>
+            data-typecadence-mistakes-present='3'
+            id='demo-mistakes-present'>
           This is Typecadence with a maximum of three mistakes present before backspacing to correct the earliest mistake.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-mistakes-present')">Restart</button></p>
       </div>
     </div>
-    
+
     <div>
       <h3>Mistakes: Keyboard Layout</h3>
       <div>
@@ -244,9 +257,11 @@
           &lt;span class="typecadence" <b>data-typecadence-mistakes-keyboard</b>="<i>azerty</i>"&gt;This is Typecadence with a AZERTY keyboard layout.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-mistakes-keyboard='azerty'>
+            data-typecadence-mistakes-keyboard='azerty'
+            id='demo-keyboard'>
           This is Typecadence with a AZERTY keyboard layout.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-keyboard')">Restart</button></p>
       </div>
     </div>
   </main>
@@ -280,12 +295,14 @@
           &lt;span class="typecadence" <b>data-typecadence-caret</b>="<i>false</i>"&gt;This is Typecadence with caret.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret='false'>
+            data-typecadence-caret='false'
+            id='demo-caret'>
           This is Typecadence without a caret.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret')">Restart</button></p>
       </div>
     </div>
-    
+
     <div>
       <h3>Caret: Tag</h3>
       <div>
@@ -301,9 +318,11 @@
           &lt;span class="typecadence" <b>data-typecadence-caret-tag</b>="<i>i</i>"&gt;This is Typecadence with a caret rendered as an italic element.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret-tag='i'>
+            data-typecadence-caret-tag='i'
+            id='demo-caret-tag'>
           This is Typecadence with a caret rendered as an italic element.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret-tag')">Restart</button></p>
       </div>
     </div>
 
@@ -322,9 +341,11 @@
           &lt;span class="typecadence" <b>data-typecadence-caret-class</b>="<i>my-caret</i>"&gt;This is Typecadence with a custom caret class.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret-class='my-caret'>
+            data-typecadence-caret-class='my-caret'
+            id='demo-caret-class'>
           This is Typecadence with a custom caret class.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret-class')">Restart</button></p>
       </div>
     </div>
 
@@ -343,9 +364,11 @@
           &lt;span class="typecadence" <b>data-typecadence-caret-id</b>="<i>my-caret-id</i>"&gt;This is Typecadence with a custom caret ID.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret-id='my-caret-id'>
+            data-typecadence-caret-id='my-caret-id'
+            id='demo-caret-id'>
           This is Typecadence with a custom caret ID.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret-id')">Restart</button></p>
       </div>
     </div>
 
@@ -364,12 +387,14 @@
           &lt;span class="typecadence" <b>data-typecadence-caret-char</b>="<i>_</i>"&gt;This is Typecadence with a custom caret character.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret-char='_'>
+            data-typecadence-caret-char='_'
+            id='demo-caret-char'>
           This is Typecadence with a custom caret character.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret-char')">Restart</button></p>
       </div>
     </div>
-    
+
     <div>
       <h3>Caret: Color</h3>
       <div>
@@ -385,12 +410,14 @@
           &lt;span class="typecadence" <b>data-typecadence-caret-color</b>="<i>#cc2127</i>"&gt;This is Typecadence with a custom caret color.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret-color='#cc2127'>
+            data-typecadence-caret-color='#cc2127'
+            id='demo-caret-color'>
           This is Typecadence with a custom caret color.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret-color')">Restart</button></p>
       </div>
     </div>
-    
+
     <div>
       <h3>Caret: Blink</h3>
       <div>
@@ -406,12 +433,14 @@
           &lt;span class="typecadence" <b>data-typecadence-caret-blink</b>="<i>false</i>"&gt;This is Typecadence without a blinking caret.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret-blink='false'>
+            data-typecadence-caret-blink='false'
+            id='demo-caret-blink'>
           This is Typecadence without a blinking caret.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret-blink')">Restart</button></p>
       </div>
     </div>
-    
+
     <div>
       <h3>Caret: Blink Speed</h3>
       <div>
@@ -427,12 +456,14 @@
           &lt;span class="typecadence" <b>data-typecadence-caret-blink-speed</b>="<i>1000</i>"&gt;This is Typecadence with a slower blinking caret.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret-blink-speed='1000'>
+            data-typecadence-caret-blink-speed='1000'
+            id='demo-caret-blink-speed'>
           This is Typecadence with a slower blinking caret.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret-blink-speed')">Restart</button></p>
       </div>
     </div>
-    
+
     <div>
       <h3>Caret: Remain</h3>
       <div>
@@ -448,12 +479,14 @@
           &lt;span class="typecadence" <b>data-typecadence-caret-remain</b>="<i>true</i>"&gt;This is Typecadence with a caret that permanently remains at the end of the text.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret-remain='true'>
+            data-typecadence-caret-remain='true'
+            id='demo-caret-remain'>
           This is Typecadence with a caret that permanently remains at the end of the text.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret-remain')">Restart</button></p>
       </div>
     </div>
-    
+
     <div>
       <h3>Caret: Remain Timeout</h3>
       <div>
@@ -469,9 +502,11 @@
           &lt;span class="typecadence" <b>data-typecadence-caret-remain-timeout</b>="<i>5000</i>"&gt;This is Typecadence with a caret that remains at the end of the text for five seconds.&lt;/span&gt;
         </code>
         <div class='typecadence'
-            data-typecadence-caret-remain-timeout='5000'>
+            data-typecadence-caret-remain-timeout='5000'
+            id='demo-caret-remain-timeout'>
           This is Typecadence with a caret that remains at the end of the text for five seconds.
         </div>
+        <p><button onclick="Typecadence.restart('#demo-caret-remain-timeout')">Restart</button></p>
       </div>
     </div>
   </main>
@@ -508,6 +543,7 @@
           This animation will call a function when complete.
         </div>
         <p id='callback-result'></p>
+        <p><button onclick="Typecadence.restart('#callback-demo')">Restart</button></p>
       </div>
     </div>
 
@@ -524,10 +560,109 @@
           This animation will fire an event when complete.
         </div>
         <p id='event-result'></p>
+        <p><button onclick="Typecadence.restart('#event-demo')">Restart</button></p>
       </div>
     </div>
   </main>
 </section>
+<section>
+  <main>
+    <h2 class='typecadence'
+      data-typecadence-speed='25'
+      data-typecadence-caret-remain='true'
+      data-typecadence-caret-color='#cc2127'
+      data-typecadence-caret-char='_'
+      data-typecadence-mistakes='0'
+      data-typecadence-caret-blink-speed='750'
+    >Programmatic Control</h2>
+    <p>
+      By default, animations start automatically when elements become visible. Use the trigger attribute and static methods to control animations programmatically.
+    </p>
+
+    <div>
+      <h3>Control: Trigger</h3>
+      <div>
+        <p>
+          Control when the animation starts. Set to <code>manual</code> to prevent auto-start and trigger the animation programmatically using <code>Typecadence.play()</code>.
+        </p>
+        <ul>
+          <li><b>Attribute</b>: <code>data-typecadence-trigger</code></li>
+          <li><b>Value</b>: <var title='Trigger Mode'>String</var></li>
+          <li><b>Options</b>: <code>visible</code> or <code>manual</code></li>
+          <li><b>Default</b>: <code>visible</code></li>
+        </ul>
+        <code>
+          &lt;span class="typecadence" <b>data-typecadence-trigger</b>="<i>manual</i>" id="manual-demo"&gt;This animation waits to be played.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            data-typecadence-trigger='manual'
+            id='manual-demo'>
+          This animation waits to be played.
+        </div>
+        <p>
+          <button onclick="Typecadence.play('#manual-demo')">Play Animation</button>
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h3>Control: Play</h3>
+      <div>
+        <p>
+          Start or resume an animation. If the animation is paused, it resumes. Otherwise, it starts a new animation. Accepts an element or a CSS selector string.
+        </p>
+        <code>
+          Typecadence.play('#my-element');<br>
+          Typecadence.play(document.getElementById('my-element'));
+        </code>
+      </div>
+    </div>
+
+    <div>
+      <h3>Control: Pause</h3>
+      <div>
+        <p>
+          Pause a running animation. Use <code>Typecadence.play()</code> to resume. Returns <code>true</code> on success.
+        </p>
+        <code>
+          Typecadence.pause('#my-element');
+        </code>
+        <div class='typecadence'
+            data-typecadence-trigger='manual'
+            data-typecadence-speed='150,250'
+            id='pause-demo'>
+          This is a demonstration of pause and play functionality. Click the buttons below to control it.
+        </div>
+        <p>
+          <button onclick="Typecadence.play('#pause-demo')">Play</button>
+          <button onclick="Typecadence.pause('#pause-demo')">Pause</button>
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h3>Control: Restart</h3>
+      <div>
+        <p>
+          Restart an animation from the beginning. This cancels any running animation and starts fresh. Returns a Promise that resolves when the new animation completes.
+        </p>
+        <code>
+          Typecadence.restart('#my-element');
+        </code>
+        <div class='typecadence'
+            data-typecadence-trigger='manual'
+            id='restart-demo'>
+          Click restart to replay this animation.
+        </div>
+        <p>
+          <button onclick="Typecadence.play('#restart-demo')">Play</button>
+          <button onclick="Typecadence.restart('#restart-demo')">Restart</button>
+        </p>
+      </div>
+    </div>
+  </main>
+</section>
+
 <script>
   function onTypingComplete(element) {
     document.getElementById('callback-result').textContent = 'Callback fired! Animation complete.';

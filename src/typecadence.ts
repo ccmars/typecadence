@@ -1,8 +1,7 @@
 declare var exports: any;
-declare var module: any;
 declare var define: any;
 
-(function (global, factory) {
+(function (global: any, factory: () => any) {
   if (typeof exports === 'object' && typeof module !== 'undefined') {
     module.exports = factory();
   } else if (typeof define === 'function' && define.amd) {
@@ -14,7 +13,10 @@ declare var define: any;
   'use strict';
 
   class Typecadence {
+    static #instance: Typecadence | null = null;
     readonly #elements: NodeListOf<HTMLElement>;
+    readonly #playbackState: Map<HTMLElement, { paused: boolean; resumeResolve?: () => void; originalText?: string; cancelled?: boolean }> = new Map();
+    readonly #storedText: Map<HTMLElement, string> = new Map();
     readonly #defaultSettings: AnimationSettings = {
       debug: false,
       delay: 0,
@@ -39,6 +41,7 @@ declare var define: any;
       mistakesPresent: 1,
       callback: '',
       keyboard: KeyboardLayout.QWERTY,
+      trigger: TriggerMode.VISIBLE,
     };
     readonly #adjacentMapping = {
       qwerty: {
@@ -205,19 +208,119 @@ declare var define: any;
         rootMargin: "0px",
         threshold: 0.1,
       });
+      Typecadence.#instance = this;
       this.init();
     }
 
     init(): void {
       for (const element of this.#elements) {
+        // For manual trigger elements, hide text immediately and store it
+        const triggerAttr = element.getAttribute("data-typecadence-trigger")?.toLowerCase();
+        if (triggerAttr === TriggerMode.MANUAL) {
+          this.#storedText.set(element, element.textContent?.trim() || '');
+          element.textContent = '';
+        }
         this.#observer.observe(element);
       }
+    }
+
+    static play(element: HTMLElement | string): Promise<void> | null {
+      const instance = Typecadence.#instance;
+      if (!instance) {
+        console.warn('Typecadence: No instance available. Ensure Typecadence is initialized.');
+        return null;
+      }
+
+      const targetElement = typeof element === 'string'
+        ? document.querySelector(element) as HTMLElement | null
+        : element;
+
+      if (!targetElement) {
+        console.warn('Typecadence: Element not found.');
+        return null;
+      }
+
+      // If animation exists and is paused, resume it
+      const state = instance.#playbackState.get(targetElement);
+      if (state?.paused && state.resumeResolve) {
+        state.paused = false;
+        state.resumeResolve();
+        state.resumeResolve = undefined;
+        return null;
+      }
+
+      // Otherwise start a new animation
+      return instance.animateText(targetElement);
+    }
+
+    static pause(element: HTMLElement | string): boolean {
+      const instance = Typecadence.#instance;
+      if (!instance) {
+        console.warn('Typecadence: No instance available. Ensure Typecadence is initialized.');
+        return false;
+      }
+
+      const targetElement = typeof element === 'string'
+        ? document.querySelector(element) as HTMLElement | null
+        : element;
+
+      if (!targetElement) {
+        console.warn('Typecadence: Element not found.');
+        return false;
+      }
+
+      const state = instance.#playbackState.get(targetElement);
+      if (!state) {
+        console.warn('Typecadence: No active animation for this element.');
+        return false;
+      }
+
+      state.paused = true;
+      return true;
+    }
+
+    static restart(element: HTMLElement | string): Promise<void> | null {
+      const instance = Typecadence.#instance;
+      if (!instance) {
+        console.warn('Typecadence: No instance available. Ensure Typecadence is initialized.');
+        return null;
+      }
+
+      const targetElement = typeof element === 'string'
+        ? document.querySelector(element) as HTMLElement | null
+        : element;
+
+      if (!targetElement) {
+        console.warn('Typecadence: Element not found.');
+        return null;
+      }
+
+      const state = instance.#playbackState.get(targetElement);
+      if (state) {
+        // Cancel current animation
+        state.cancelled = true;
+        if (state.paused && state.resumeResolve) {
+          state.resumeResolve();
+        }
+        // Store original text for the next animation to pick up
+        if (state.originalText !== undefined) {
+          instance.#storedText.set(targetElement, state.originalText);
+          targetElement.textContent = '';
+        }
+        instance.#playbackState.delete(targetElement);
+      }
+
+      return instance.animateText(targetElement);
     }
 
     #handleIntersect(entries: IntersectionObserverEntry[]): void {
       for (const entry of entries) {
         if (entry.isIntersecting) {
-          this.animateText(entry.target as HTMLElement);
+          const element = entry.target as HTMLElement;
+          const triggerAttr = element.getAttribute("data-typecadence-trigger")?.toLowerCase();
+          if (triggerAttr !== TriggerMode.MANUAL) {
+            this.animateText(element);
+          }
           this.#observer.unobserve(entry.target);
         }
       }
@@ -278,6 +381,9 @@ declare var define: any;
       const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
         keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
           this.#defaultSettings.keyboard;
+      const triggerAttribute = element.getAttribute("data-typecadence-trigger")?.toLowerCase();
+      const trigger = triggerAttribute === TriggerMode.MANUAL ? TriggerMode.MANUAL :
+        this.#defaultSettings.trigger;
 
       const animationSettings = {
         debug,
@@ -302,7 +408,8 @@ declare var define: any;
         callback,
         mistakes,
         mistakesPresent,
-        keyboard
+        keyboard,
+        trigger
       };
 
       if (debug) console.debug("Typecadence settings:", animationSettings);
@@ -376,11 +483,25 @@ declare var define: any;
       await new Promise(resolve => setTimeout(resolve, this.#getTypingSpeed(minSpeed, maxSpeed)));
     }
 
+    async #waitIfPaused(element: HTMLElement): Promise<void> {
+      const state = this.#playbackState.get(element);
+      if (state?.paused) {
+        await new Promise<void>(resolve => {
+          state.resumeResolve = resolve;
+        });
+      }
+    }
+
     async animateText(element: HTMLElement): Promise<void> {
       const animationSettings = this.#parseAnimationSettings(element);
 
-      // Define text content
-      const text = element.textContent?.trim() || '';
+      // Define text content (use pre-stored text for manual trigger elements)
+      const text = this.#storedText.get(element) || element.textContent?.trim() || '';
+      this.#storedText.delete(element);
+
+      // Initialize playback state with original text
+      this.#playbackState.set(element, { paused: false, originalText: text });
+
       element.textContent = "";
 
       let caret: HTMLElement | null = null;
@@ -392,6 +513,7 @@ declare var define: any;
         element.appendChild(caret);
 
         if (animationSettings.caretBlink) {
+          // @ts-ignore - browser setInterval returns number
           caretAnimationInterval = setInterval(() => {
             if (caret.style.visibility === "visible") {
               caret.style.visibility = "hidden";
@@ -410,7 +532,21 @@ declare var define: any;
       let justCorrected = false;
 
       // Type animation
+      const animationState = this.#playbackState.get(element);
       while (currentIndex < text.length || mistakeBuffer.length > 0) {
+        // Check if cancelled (e.g., by restart)
+        if (animationState?.cancelled) {
+          return;
+        }
+
+        // Wait if paused
+        await this.#waitIfPaused(element);
+
+        // Check again after pause in case we were cancelled while paused
+        if (animationState?.cancelled) {
+          return;
+        }
+
         // Correct mistakes
         if (
           mistakeBuffer.length >= animationSettings.mistakesPresent
@@ -483,6 +619,9 @@ declare var define: any;
         }
       }
 
+      // Clean up playback state
+      this.#playbackState.delete(element);
+
       // Dispatch completion event
       element.dispatchEvent(new CustomEvent('typecadence:complete', {
         bubbles: true,
@@ -522,7 +661,13 @@ declare var define: any;
     callback: string;
     mistakes: number;
     mistakesPresent: number;
-    keyboard: KeyboardLayout
+    keyboard: KeyboardLayout;
+    trigger: TriggerMode;
+  }
+
+  enum TriggerMode {
+    VISIBLE = 'visible',
+    MANUAL = 'manual'
   }
 
   enum KeyboardLayout {
