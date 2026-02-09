@@ -254,12 +254,14 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                 console.warn('Typecadence: Element not found.');
                 return null;
             }
-            // If animation exists and is paused, resume it
+            // If animation is active, either resume (if paused) or ignore
             const state = __classPrivateFieldGet(instance, _Typecadence_playbackState, "f").get(targetElement);
-            if ((state === null || state === void 0 ? void 0 : state.paused) && state.resumeResolve) {
-                state.paused = false;
-                state.resumeResolve();
-                state.resumeResolve = undefined;
+            if (state) {
+                if (state.paused && state.resumeResolve) {
+                    state.paused = false;
+                    state.resumeResolve();
+                    state.resumeResolve = undefined;
+                }
                 return null;
             }
             // Otherwise start a new animation
@@ -317,7 +319,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
         }
         animateText(element) {
             return __awaiter(this, void 0, void 0, function* () {
-                var _b, _c, _d, _e, _f;
+                var _b, _c, _d, _e, _f, _g;
                 const animationSettings = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseAnimationSettings).call(this, element);
                 // Define text content (use pre-stored text for manual trigger elements)
                 const text = __classPrivateFieldGet(this, _Typecadence_storedText, "f").get(element) || ((_b = element.textContent) === null || _b === void 0 ? void 0 : _b.trim()) || '';
@@ -353,12 +355,16 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                 while (currentIndex < text.length || mistakeBuffer.length > 0) {
                     // Check if cancelled (e.g., by restart)
                     if (animationState === null || animationState === void 0 ? void 0 : animationState.cancelled) {
+                        if (caretAnimationInterval)
+                            clearInterval(caretAnimationInterval);
                         return;
                     }
                     // Wait if paused
                     yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_waitIfPaused).call(this, element);
                     // Check again after pause in case we were cancelled while paused
                     if (animationState === null || animationState === void 0 ? void 0 : animationState.cancelled) {
+                        if (caretAnimationInterval)
+                            clearInterval(caretAnimationInterval);
                         return;
                     }
                     // Correct mistakes
@@ -426,7 +432,11 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                         }
                     }
                 }
-                // Clean up playback state
+                // Preserve original text for potential restart, then clean up playback state
+                const originalText = (_g = __classPrivateFieldGet(this, _Typecadence_playbackState, "f").get(element)) === null || _g === void 0 ? void 0 : _g.originalText;
+                if (originalText !== undefined) {
+                    __classPrivateFieldGet(this, _Typecadence_storedText, "f").set(element, originalText);
+                }
                 __classPrivateFieldGet(this, _Typecadence_playbackState, "f").delete(element);
                 // Dispatch completion event
                 element.dispatchEvent(new CustomEvent('typecadence:complete', {

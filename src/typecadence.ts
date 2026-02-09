@@ -240,12 +240,14 @@ declare var define: any;
         return null;
       }
 
-      // If animation exists and is paused, resume it
+      // If animation is active, either resume (if paused) or ignore
       const state = instance.#playbackState.get(targetElement);
-      if (state?.paused && state.resumeResolve) {
-        state.paused = false;
-        state.resumeResolve();
-        state.resumeResolve = undefined;
+      if (state) {
+        if (state.paused && state.resumeResolve) {
+          state.paused = false;
+          state.resumeResolve();
+          state.resumeResolve = undefined;
+        }
         return null;
       }
 
@@ -536,6 +538,7 @@ declare var define: any;
       while (currentIndex < text.length || mistakeBuffer.length > 0) {
         // Check if cancelled (e.g., by restart)
         if (animationState?.cancelled) {
+          if (caretAnimationInterval) clearInterval(caretAnimationInterval);
           return;
         }
 
@@ -544,6 +547,7 @@ declare var define: any;
 
         // Check again after pause in case we were cancelled while paused
         if (animationState?.cancelled) {
+          if (caretAnimationInterval) clearInterval(caretAnimationInterval);
           return;
         }
 
@@ -619,7 +623,11 @@ declare var define: any;
         }
       }
 
-      // Clean up playback state
+      // Preserve original text for potential restart, then clean up playback state
+      const originalText = this.#playbackState.get(element)?.originalText;
+      if (originalText !== undefined) {
+        this.#storedText.set(element, originalText);
+      }
       this.#playbackState.delete(element);
 
       // Dispatch completion event
