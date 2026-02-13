@@ -15,7 +15,7 @@ declare var define: any;
   class Typecadence {
     static #instance: Typecadence | null = null;
     readonly #elements: NodeListOf<HTMLElement>;
-    readonly #playbackState: Map<HTMLElement, { paused: boolean; resumeResolve?: () => void; originalText?: string; cancelled?: boolean }> = new Map();
+    readonly #playbackState: Map<HTMLElement, { paused: boolean; resumeResolve?: () => void; originalText?: string; cancelled?: boolean; caretInterval?: number }> = new Map();
     readonly #storedText: Map<HTMLElement, string> = new Map();
     readonly #defaultSettings: AnimationSettings = {
       debug: false,
@@ -41,7 +41,6 @@ declare var define: any;
       mistakesPresent: 1,
       callback: '',
       keyboard: KeyboardLayout.QWERTY,
-      trigger: TriggerMode.VISIBLE,
     };
     readonly #adjacentMapping = {
       qwerty: {
@@ -202,6 +201,9 @@ declare var define: any;
     #observer: IntersectionObserver;
 
     constructor() {
+      if (Typecadence.#instance) {
+        return Typecadence.#instance;
+      }
       this.#elements = document.querySelectorAll(".typecadence");
       this.#observer = new IntersectionObserver(this.#handleIntersect.bind(this), {
         root: null,
@@ -210,6 +212,11 @@ declare var define: any;
       });
       Typecadence.#instance = this;
       this.init();
+    }
+
+    /** @internal Reset singleton for testing. */
+    static _resetInstance(): void {
+      Typecadence.#instance = null;
     }
 
     init(): void {
@@ -252,7 +259,7 @@ declare var define: any;
       }
 
       // Otherwise start a new animation
-      return instance.animateText(targetElement);
+      return instance.#animateText(targetElement);
     }
 
     static pause(element: HTMLElement | string): boolean {
@@ -301,6 +308,9 @@ declare var define: any;
       if (state) {
         // Cancel current animation
         state.cancelled = true;
+        if (state.caretInterval) {
+          clearInterval(state.caretInterval);
+        }
         if (state.paused && state.resumeResolve) {
           state.resumeResolve();
         }
@@ -312,7 +322,7 @@ declare var define: any;
         instance.#playbackState.delete(targetElement);
       }
 
-      return instance.animateText(targetElement);
+      return instance.#animateText(targetElement);
     }
 
     #handleIntersect(entries: IntersectionObserverEntry[]): void {
@@ -321,7 +331,7 @@ declare var define: any;
           const element = entry.target as HTMLElement;
           const triggerAttr = element.getAttribute("data-typecadence-trigger")?.toLowerCase();
           if (triggerAttr !== TriggerMode.MANUAL) {
-            this.animateText(element);
+            this.#animateText(element);
           }
           this.#observer.unobserve(entry.target);
         }
@@ -383,10 +393,6 @@ declare var define: any;
       const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
         keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
           this.#defaultSettings.keyboard;
-      const triggerAttribute = element.getAttribute("data-typecadence-trigger")?.toLowerCase();
-      const trigger = triggerAttribute === TriggerMode.MANUAL ? TriggerMode.MANUAL :
-        this.#defaultSettings.trigger;
-
       const animationSettings = {
         debug,
         delay,
@@ -411,7 +417,6 @@ declare var define: any;
         mistakes,
         mistakesPresent,
         keyboard,
-        trigger
       };
 
       if (debug) console.debug("Typecadence settings:", animationSettings);
@@ -494,7 +499,7 @@ declare var define: any;
       }
     }
 
-    async animateText(element: HTMLElement): Promise<void> {
+    async #animateText(element: HTMLElement): Promise<void> {
       const animationSettings = this.#parseAnimationSettings(element);
 
       // Define text content (use pre-stored text for manual trigger elements)
@@ -523,6 +528,10 @@ declare var define: any;
               caret.style.visibility = "visible";
             }
           }, animationSettings.caretBlinkSpeed);
+          const currentState = this.#playbackState.get(element);
+          if (currentState) {
+            currentState.caretInterval = caretAnimationInterval;
+          }
         }
       }
 
@@ -670,7 +679,6 @@ declare var define: any;
     mistakes: number;
     mistakesPresent: number;
     keyboard: KeyboardLayout;
-    trigger: TriggerMode;
   }
 
   enum TriggerMode {
