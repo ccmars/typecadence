@@ -698,6 +698,353 @@ describe('Events & callbacks', () => {
 });
 
 // ===========================================================================
+// Manual trigger
+// ===========================================================================
+
+describe('Manual trigger', () => {
+  test('manual trigger elements hide text on initialization', () => {
+    const el = createElement('Hello', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+    });
+    new Typecadence();
+
+    // Text should be hidden immediately after init
+    expect(el.textContent).toBe('');
+  });
+
+  test('manual trigger elements do not auto-start when intersecting', async () => {
+    const el = createElement('Hello', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+    });
+    new Typecadence();
+
+    // Simulate intersection
+    intersectionCallback([{ isIntersecting: true, target: el }]);
+
+    // Wait a bit to ensure no animation started
+    jest.advanceTimersByTime(500);
+    await new Promise<void>(r => process.nextTick(r));
+
+    // Element should still be empty (text hidden, no animation)
+    expect(el.textContent).toBe('');
+    expect(unobserveMock).toHaveBeenCalledWith(el);
+  });
+
+  test('Typecadence.play() triggers animation on manual trigger element', async () => {
+    const el = createElement('Hi', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+    });
+    new Typecadence();
+
+    // Simulate intersection (element becomes visible but doesn't animate)
+    intersectionCallback([{ isIntersecting: true, target: el }]);
+    expect(el.textContent).toBe('');
+
+    // Now trigger animation manually
+    const promise = Typecadence.play(el);
+    expect(promise).not.toBeNull();
+
+    await drainAnimation(promise!);
+
+    expect(getVisibleText(el)).toBe('Hi');
+  });
+
+  test('Typecadence.play() works with a CSS selector string', async () => {
+    const el = createElement('Hi', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+    });
+    el.id = 'my-element';
+    new Typecadence();
+
+    // Simulate intersection
+    intersectionCallback([{ isIntersecting: true, target: el }]);
+
+    // Trigger animation using selector
+    const promise = Typecadence.play('#my-element');
+    expect(promise).not.toBeNull();
+
+    await drainAnimation(promise!);
+
+    expect(getVisibleText(el)).toBe('Hi');
+  });
+
+  test('Typecadence.play() returns null when element not found', () => {
+    new Typecadence();
+
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const result = Typecadence.play('#non-existent');
+
+    expect(result).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith('Typecadence: Element not found.');
+  });
+
+  test('Typecadence.play() can animate elements without waiting for intersection', async () => {
+    const el = createElement('Direct', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+    });
+    new Typecadence();
+
+    // Don't trigger intersection, just call start directly
+    const promise = Typecadence.play(el);
+    expect(promise).not.toBeNull();
+
+    await drainAnimation(promise!);
+
+    expect(getVisibleText(el)).toBe('Direct');
+  });
+
+  test('visible trigger (default) still auto-starts', async () => {
+    const el = createElement('Auto', {
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+    });
+    new Typecadence();
+
+    // Simulate intersection
+    intersectionCallback([{ isIntersecting: true, target: el }]);
+
+    // Drain the animation
+    for (let i = 0; i < 500; i++) {
+      jest.advanceTimersByTime(50);
+      await new Promise<void>(r => process.nextTick(r));
+      if (getVisibleText(el) === 'Auto') break;
+    }
+
+    expect(getVisibleText(el)).toBe('Auto');
+  });
+
+  test('explicit visible trigger behaves like default', async () => {
+    const el = createElement('Visible', {
+      'data-typecadence-trigger': 'visible',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+    });
+    new Typecadence();
+
+    // Simulate intersection
+    intersectionCallback([{ isIntersecting: true, target: el }]);
+
+    // Drain the animation
+    for (let i = 0; i < 500; i++) {
+      jest.advanceTimersByTime(50);
+      await new Promise<void>(r => process.nextTick(r));
+      if (getVisibleText(el) === 'Visible') break;
+    }
+
+    expect(getVisibleText(el)).toBe('Visible');
+  });
+
+  test('Typecadence.pause() pauses the animation', async () => {
+    const el = createElement('Hello', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+      'data-typecadence-speed': '50',
+    });
+    new Typecadence();
+
+    // Start animation
+    const promise = Typecadence.play(el);
+
+    // Let a few characters type
+    for (let i = 0; i < 3; i++) {
+      jest.advanceTimersByTime(50);
+      await new Promise<void>(r => process.nextTick(r));
+    }
+    const textBeforePause = getVisibleText(el);
+    expect(textBeforePause.length).toBeGreaterThan(0);
+    expect(textBeforePause.length).toBeLessThan(5);
+
+    // Pause
+    const pauseResult = Typecadence.pause(el);
+    expect(pauseResult).toBe(true);
+
+    // Advance time - animation should not progress
+    jest.advanceTimersByTime(500);
+    await new Promise<void>(r => process.nextTick(r));
+    expect(getVisibleText(el)).toBe(textBeforePause);
+
+    // Play (resume) and complete
+    Typecadence.play(el);
+    await drainAnimation(promise!);
+
+    expect(getVisibleText(el)).toBe('Hello');
+  });
+
+  test('Typecadence.play() resumes a paused animation', async () => {
+    const el = createElement('Test', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+      'data-typecadence-speed': '50',
+    });
+    new Typecadence();
+
+    // Start animation
+    const promise = Typecadence.play(el);
+
+    // Let some typing happen
+    jest.advanceTimersByTime(50);
+    await new Promise<void>(r => process.nextTick(r));
+
+    // Pause
+    Typecadence.pause(el);
+    jest.advanceTimersByTime(50);
+    await new Promise<void>(r => process.nextTick(r));
+
+    // Play should resume (returns null when resuming, not a new promise)
+    const resumeResult = Typecadence.play(el);
+    expect(resumeResult).toBeNull();
+
+    await drainAnimation(promise!);
+    expect(getVisibleText(el)).toBe('Test');
+  });
+
+  test('Typecadence.pause() returns false when no animation is running', () => {
+    const el = createElement('Test', {
+      'data-typecadence-trigger': 'manual',
+    });
+    new Typecadence();
+
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const result = Typecadence.pause(el);
+
+    expect(result).toBe(false);
+    expect(warnSpy).toHaveBeenCalledWith('Typecadence: No active animation for this element.');
+  });
+
+  test('Typecadence.pause() and play() work with CSS selectors', async () => {
+    const el = createElement('Hi', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+      'data-typecadence-speed': '50',
+    });
+    el.id = 'pausable';
+    new Typecadence();
+
+    const promise = Typecadence.play('#pausable');
+
+    // Let one character type
+    jest.advanceTimersByTime(50);
+    await new Promise<void>(r => process.nextTick(r));
+
+    // Pause using selector
+    expect(Typecadence.pause('#pausable')).toBe(true);
+
+    // Advance timer so animation enters the paused wait state
+    jest.advanceTimersByTime(50);
+    await new Promise<void>(r => process.nextTick(r));
+
+    // Play (resume) using selector
+    Typecadence.play('#pausable');
+    // Flush microtasks after play
+    await new Promise<void>(r => process.nextTick(r));
+
+    await drainAnimation(promise!);
+
+    expect(getVisibleText(el)).toBe('Hi');
+  });
+
+  test('Typecadence.restart() restarts animation from beginning', async () => {
+    const el = createElement('Hello', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+      'data-typecadence-speed': '50',
+    });
+    new Typecadence();
+
+    // Start animation
+    Typecadence.play(el);
+
+    // Let a few characters type
+    for (let i = 0; i < 3; i++) {
+      jest.advanceTimersByTime(50);
+      await new Promise<void>(r => process.nextTick(r));
+    }
+    const textBeforeRestart = getVisibleText(el);
+    expect(textBeforeRestart.length).toBeGreaterThan(0);
+    expect(textBeforeRestart.length).toBeLessThan(5);
+
+    // Restart
+    const promise = Typecadence.restart(el);
+    expect(promise).not.toBeNull();
+
+    // Flush to let old animation exit
+    await new Promise<void>(r => process.nextTick(r));
+
+    await drainAnimation(promise!);
+
+    expect(getVisibleText(el)).toBe('Hello');
+  });
+
+  test('Typecadence.restart() works with CSS selector', async () => {
+    const el = createElement('Hi', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+    });
+    el.id = 'restartable';
+    new Typecadence();
+
+    Typecadence.play('#restartable');
+
+    // Let animation progress
+    jest.advanceTimersByTime(100);
+    await new Promise<void>(r => process.nextTick(r));
+
+    // Restart using selector
+    const promise = Typecadence.restart('#restartable');
+    await new Promise<void>(r => process.nextTick(r));
+
+    await drainAnimation(promise!);
+
+    expect(getVisibleText(el)).toBe('Hi');
+  });
+
+  test('Typecadence.restart() works on completed animation', async () => {
+    const el = createElement('Hi', {
+      'data-typecadence-trigger': 'manual',
+      'data-typecadence-mistakes': '0',
+      'data-typecadence-caret': 'false',
+    });
+    new Typecadence();
+
+    // Complete first animation
+    await drainAnimation(Typecadence.play(el)!);
+    expect(getVisibleText(el)).toBe('Hi');
+
+    // Restart
+    const promise = Typecadence.restart(el);
+
+    // Need to restore original text first for restart to work on completed animation
+    // Since playback state is cleared after completion, restart just starts fresh
+    await drainAnimation(promise!);
+
+    expect(getVisibleText(el)).toBe('Hi');
+  });
+
+  test('Typecadence.restart() returns null when element not found', () => {
+    new Typecadence();
+
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const result = Typecadence.restart('#non-existent');
+
+    expect(result).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith('Typecadence: Element not found.');
+  });
+});
+
+// ===========================================================================
 // Edge cases
 // ===========================================================================
 

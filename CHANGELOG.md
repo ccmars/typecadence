@@ -5,11 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-09
+
+### Added
+
+- Manual trigger mode via `data-typecadence-trigger="manual"` attribute — elements with this attribute do not auto-animate on scroll
+- `Typecadence.play()` static method to start or resume an animation programmatically
+- `Typecadence.pause()` static method to pause an in-progress animation
+- `Typecadence.restart()` static method to restart an animation from the beginning
+
 ## [1.1.1] - 2026-02-01
 
 ### Added
 
-- Unit test suite with 41 tests covering constructor, IntersectionObserver, typing, caret, settings parsing, mistakes, events, callbacks, and edge cases
+- Unit test suite covering constructor, IntersectionObserver, typing, caret, settings parsing, mistakes, events, callbacks, and edge cases
 
 ### Fixed
 
@@ -93,7 +102,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - QWERTY, QWERTZ, and AZERTY keyboard layout support for adjacent character mistakes
 - IntersectionObserver-based animation trigger on element visibility
 
-[1.1.1]: https://github.com/ccmars/typecadence/compare/v1.1.0...HEAD
+[1.2.0]: https://github.com/ccmars/typecadence/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/ccmars/typecadence/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ccmars/typecadence/compare/v1.0.8...v1.1.0
 [1.0.8]: https://github.com/ccmars/typecadence/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/ccmars/typecadence/compare/v1.0.6...v1.0.7

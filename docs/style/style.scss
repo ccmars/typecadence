@@ -112,6 +112,25 @@ div.typecadence {
   margin: 0.75em 0;
 }
 
+button {
+  background: transparent;
+  color: $color-yellow;
+  border: 1px solid $color-yellow;
+  padding: 0.4em 1.6em;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: $color-yellow;
+    color: $color-greenDarkest;
+  }
+}
+
 #demo {
   background-color: $color-greenDark;
   overflow:hidden;

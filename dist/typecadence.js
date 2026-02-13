@@ -30,11 +30,13 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     }
 }(this, function () {
     'use strict';
-    var _Typecadence_instances, _Typecadence_elements, _Typecadence_defaultSettings, _Typecadence_adjacentMapping, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseAnimationSettings, _Typecadence_parseSpeedAttribute, _Typecadence_parsePercent, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_isMistake, _Typecadence_incorrectChar, _Typecadence_backspace;
+    var _Typecadence_instances, _a, _Typecadence_instance, _Typecadence_elements, _Typecadence_playbackState, _Typecadence_storedText, _Typecadence_defaultSettings, _Typecadence_adjacentMapping, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseAnimationSettings, _Typecadence_parseSpeedAttribute, _Typecadence_parsePercent, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_isMistake, _Typecadence_incorrectChar, _Typecadence_backspace, _Typecadence_waitIfPaused;
     class Typecadence {
         constructor() {
             _Typecadence_instances.add(this);
             _Typecadence_elements.set(this, void 0);
+            _Typecadence_playbackState.set(this, new Map());
+            _Typecadence_storedText.set(this, new Map());
             _Typecadence_defaultSettings.set(this, {
                 debug: false,
                 delay: 0,
@@ -59,6 +61,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                 mistakesPresent: 1,
                 callback: '',
                 keyboard: KeyboardLayout.QWERTY,
+                trigger: TriggerMode.VISIBLE,
             });
             _Typecadence_adjacentMapping.set(this, {
                 qwerty: {
@@ -223,19 +226,106 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                 rootMargin: "0px",
                 threshold: 0.1,
             }), "f");
+            __classPrivateFieldSet(_a, _a, this, "f", _Typecadence_instance);
             this.init();
         }
         init() {
+            var _b, _c;
             for (const element of __classPrivateFieldGet(this, _Typecadence_elements, "f")) {
+                // For manual trigger elements, hide text immediately and store it
+                const triggerAttr = (_b = element.getAttribute("data-typecadence-trigger")) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+                if (triggerAttr === TriggerMode.MANUAL) {
+                    __classPrivateFieldGet(this, _Typecadence_storedText, "f").set(element, ((_c = element.textContent) === null || _c === void 0 ? void 0 : _c.trim()) || '');
+                    element.textContent = '';
+                }
                 __classPrivateFieldGet(this, _Typecadence_observer, "f").observe(element);
             }
         }
+        static play(element) {
+            const instance = __classPrivateFieldGet(_a, _a, "f", _Typecadence_instance);
+            if (!instance) {
+                console.warn('Typecadence: No instance available. Ensure Typecadence is initialized.');
+                return null;
+            }
+            const targetElement = typeof element === 'string'
+                ? document.querySelector(element)
+                : element;
+            if (!targetElement) {
+                console.warn('Typecadence: Element not found.');
+                return null;
+            }
+            // If animation is active, either resume (if paused) or ignore
+            const state = __classPrivateFieldGet(instance, _Typecadence_playbackState, "f").get(targetElement);
+            if (state) {
+                if (state.paused && state.resumeResolve) {
+                    state.paused = false;
+                    state.resumeResolve();
+                    state.resumeResolve = undefined;
+                }
+                return null;
+            }
+            // Otherwise start a new animation
+            return instance.animateText(targetElement);
+        }
+        static pause(element) {
+            const instance = __classPrivateFieldGet(_a, _a, "f", _Typecadence_instance);
+            if (!instance) {
+                console.warn('Typecadence: No instance available. Ensure Typecadence is initialized.');
+                return false;
+            }
+            const targetElement = typeof element === 'string'
+                ? document.querySelector(element)
+                : element;
+            if (!targetElement) {
+                console.warn('Typecadence: Element not found.');
+                return false;
+            }
+            const state = __classPrivateFieldGet(instance, _Typecadence_playbackState, "f").get(targetElement);
+            if (!state) {
+                console.warn('Typecadence: No active animation for this element.');
+                return false;
+            }
+            state.paused = true;
+            return true;
+        }
+        static restart(element) {
+            const instance = __classPrivateFieldGet(_a, _a, "f", _Typecadence_instance);
+            if (!instance) {
+                console.warn('Typecadence: No instance available. Ensure Typecadence is initialized.');
+                return null;
+            }
+            const targetElement = typeof element === 'string'
+                ? document.querySelector(element)
+                : element;
+            if (!targetElement) {
+                console.warn('Typecadence: Element not found.');
+                return null;
+            }
+            const state = __classPrivateFieldGet(instance, _Typecadence_playbackState, "f").get(targetElement);
+            if (state) {
+                // Cancel current animation
+                state.cancelled = true;
+                if (state.paused && state.resumeResolve) {
+                    state.resumeResolve();
+                }
+                // Store original text for the next animation to pick up
+                if (state.originalText !== undefined) {
+                    __classPrivateFieldGet(instance, _Typecadence_storedText, "f").set(targetElement, state.originalText);
+                    targetElement.textContent = '';
+                }
+                __classPrivateFieldGet(instance, _Typecadence_playbackState, "f").delete(targetElement);
+            }
+            return instance.animateText(targetElement);
+        }
         animateText(element) {
             return __awaiter(this, void 0, void 0, function* () {
-                var _a, _b, _c, _d, _e;
+                var _b, _c, _d, _e, _f, _g;
                 const animationSettings = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseAnimationSettings).call(this, element);
-                // Define text content
-                const text = ((_a = element.textContent) === null || _a === void 0 ? void 0 : _a.trim()) || '';
+                // Define text content (use pre-stored text for manual trigger elements)
+                const text = __classPrivateFieldGet(this, _Typecadence_storedText, "f").get(element) || ((_b = element.textContent) === null || _b === void 0 ? void 0 : _b.trim()) || '';
+                __classPrivateFieldGet(this, _Typecadence_storedText, "f").delete(element);
+                // Initialize playback state with original text
+                __classPrivateFieldGet(this, _Typecadence_playbackState, "f").set(element, { paused: false, originalText: text });
                 element.textContent = "";
                 let caret = null;
                 let caretAnimationInterval = null;
@@ -244,6 +334,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                     caret = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_createCaret).call(this, animationSettings);
                     element.appendChild(caret);
                     if (animationSettings.caretBlink) {
+                        // @ts-ignore - browser setInterval returns number
                         caretAnimationInterval = setInterval(() => {
                             if (caret.style.visibility === "visible") {
                                 caret.style.visibility = "hidden";
@@ -258,8 +349,24 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                 yield new Promise((resolve) => setTimeout(resolve, animationSettings.delay));
                 let mistakeBuffer = [];
                 let currentIndex = 0;
+                let justCorrected = false;
                 // Type animation
+                const animationState = __classPrivateFieldGet(this, _Typecadence_playbackState, "f").get(element);
                 while (currentIndex < text.length || mistakeBuffer.length > 0) {
+                    // Check if cancelled (e.g., by restart)
+                    if (animationState === null || animationState === void 0 ? void 0 : animationState.cancelled) {
+                        if (caretAnimationInterval)
+                            clearInterval(caretAnimationInterval);
+                        return;
+                    }
+                    // Wait if paused
+                    yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_waitIfPaused).call(this, element);
+                    // Check again after pause in case we were cancelled while paused
+                    if (animationState === null || animationState === void 0 ? void 0 : animationState.cancelled) {
+                        if (caretAnimationInterval)
+                            clearInterval(caretAnimationInterval);
+                        return;
+                    }
                     // Correct mistakes
                     if (mistakeBuffer.length >= animationSettings.mistakesPresent
                         || (mistakeBuffer.length > 0
@@ -267,14 +374,16 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                         const mistakeIndex = mistakeBuffer[0];
                         const stepsToGoBack = currentIndex - mistakeIndex;
                         for (let i = 0; i < stepsToGoBack; i++) {
-                            yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, (_b = animationSettings.backspaceMinSpeed) !== null && _b !== void 0 ? _b : animationSettings.minSpeed, (_c = animationSettings.backspaceMaxSpeed) !== null && _c !== void 0 ? _c : animationSettings.maxSpeed);
+                            yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, (_c = animationSettings.backspaceMinSpeed) !== null && _c !== void 0 ? _c : animationSettings.minSpeed, (_d = animationSettings.backspaceMaxSpeed) !== null && _d !== void 0 ? _d : animationSettings.maxSpeed);
                             currentIndex--;
                         }
                         mistakeBuffer = [];
+                        justCorrected = true;
                     }
                     // Type next character
                     const char = text[currentIndex];
-                    const isMistake = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, animationSettings.mistakes);
+                    const isMistake = !justCorrected && __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, animationSettings.mistakes);
+                    justCorrected = false;
                     if (isMistake) {
                         const incorrectChar = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_incorrectChar).call(this, char, animationSettings.keyboard);
                         const charNode = document.createTextNode(incorrectChar);
@@ -298,8 +407,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                         }
                     }
                     const isSpace = char === ' ';
-                    const typingMinSpeed = isSpace ? ((_d = animationSettings.spaceMinSpeed) !== null && _d !== void 0 ? _d : animationSettings.minSpeed) : animationSettings.minSpeed;
-                    const typingMaxSpeed = isSpace ? ((_e = animationSettings.spaceMaxSpeed) !== null && _e !== void 0 ? _e : animationSettings.maxSpeed) : animationSettings.maxSpeed;
+                    const typingMinSpeed = isSpace ? ((_e = animationSettings.spaceMinSpeed) !== null && _e !== void 0 ? _e : animationSettings.minSpeed) : animationSettings.minSpeed;
+                    const typingMaxSpeed = isSpace ? ((_f = animationSettings.spaceMaxSpeed) !== null && _f !== void 0 ? _f : animationSettings.maxSpeed) : animationSettings.maxSpeed;
                     const typingSpeed = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, typingMinSpeed, typingMaxSpeed);
                     yield new Promise((resolve) => setTimeout(resolve, typingSpeed));
                     currentIndex++;
@@ -323,6 +432,12 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
                         }
                     }
                 }
+                // Preserve original text for potential restart, then clean up playback state
+                const originalText = (_g = __classPrivateFieldGet(this, _Typecadence_playbackState, "f").get(element)) === null || _g === void 0 ? void 0 : _g.originalText;
+                if (originalText !== undefined) {
+                    __classPrivateFieldGet(this, _Typecadence_storedText, "f").set(element, originalText);
+                }
+                __classPrivateFieldGet(this, _Typecadence_playbackState, "f").delete(element);
                 // Dispatch completion event
                 element.dispatchEvent(new CustomEvent('typecadence:complete', {
                     bubbles: true,
@@ -338,16 +453,21 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             });
         }
     }
-    _Typecadence_elements = new WeakMap(), _Typecadence_defaultSettings = new WeakMap(), _Typecadence_adjacentMapping = new WeakMap(), _Typecadence_observer = new WeakMap(), _Typecadence_instances = new WeakSet(), _Typecadence_handleIntersect = function _Typecadence_handleIntersect(entries) {
+    _a = Typecadence, _Typecadence_elements = new WeakMap(), _Typecadence_playbackState = new WeakMap(), _Typecadence_storedText = new WeakMap(), _Typecadence_defaultSettings = new WeakMap(), _Typecadence_adjacentMapping = new WeakMap(), _Typecadence_observer = new WeakMap(), _Typecadence_instances = new WeakSet(), _Typecadence_handleIntersect = function _Typecadence_handleIntersect(entries) {
+        var _b;
         for (const entry of entries) {
             if (entry.isIntersecting) {
-                this.animateText(entry.target);
+                const element = entry.target;
+                const triggerAttr = (_b = element.getAttribute("data-typecadence-trigger")) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+                if (triggerAttr !== TriggerMode.MANUAL) {
+                    this.animateText(element);
+                }
                 __classPrivateFieldGet(this, _Typecadence_observer, "f").unobserve(entry.target);
             }
         }
     }, _Typecadence_parseAnimationSettings = function _Typecadence_parseAnimationSettings(element) {
-        var _a, _b, _c, _d, _e, _f;
-        const debugAttribute = (_a = element.getAttribute("data-typecadence-debug")) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+        var _b, _c, _d, _e, _f, _g, _h;
+        const debugAttribute = (_b = element.getAttribute("data-typecadence-debug")) === null || _b === void 0 ? void 0 : _b.toLowerCase();
         const debug = debugAttribute === "true" ? true : debugAttribute === "false" ? false : __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").debug;
         const delayAttribute = parseInt(element.getAttribute("data-typecadence-delay"));
         const delay = isNaN(delayAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").delay : delayAttribute;
@@ -364,7 +484,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             : [NaN, NaN];
         const backspaceMinSpeed = isNaN(backspaceMinSpeedParsed) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").backspaceMinSpeed : backspaceMinSpeedParsed;
         const backspaceMaxSpeed = isNaN(backspaceMaxSpeedParsed) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").backspaceMaxSpeed : backspaceMaxSpeedParsed;
-        const displayCaretAttribute = (_b = element.getAttribute("data-typecadence-caret")) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+        const displayCaretAttribute = (_c = element.getAttribute("data-typecadence-caret")) === null || _c === void 0 ? void 0 : _c.toLowerCase();
         const caret = displayCaretAttribute === "true" ? true :
             displayCaretAttribute === "false" ? false :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caret;
@@ -373,17 +493,17 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
         const caretTag = element.getAttribute("data-typecadence-caret-tag") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretTag;
         const caretClass = element.getAttribute("data-typecadence-caret-class") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretClass;
         const caretId = element.getAttribute("data-typecadence-caret-id") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretId;
-        const caretBoldAttribute = (_c = element.getAttribute("data-typecadence-caret-bold")) === null || _c === void 0 ? void 0 : _c.toLowerCase();
+        const caretBoldAttribute = (_d = element.getAttribute("data-typecadence-caret-bold")) === null || _d === void 0 ? void 0 : _d.toLowerCase();
         const caretBold = caretBoldAttribute === "true" ? true :
             caretBoldAttribute === "false" ? false :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBold;
         const caretBlinkSpeedAttribute = parseInt(element.getAttribute("data-typecadence-caret-blink-speed"));
         const caretBlinkSpeed = isNaN(caretBlinkSpeedAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlinkSpeed : caretBlinkSpeedAttribute;
-        const caretBlinkAttribute = (_d = element.getAttribute("data-typecadence-caret-blink")) === null || _d === void 0 ? void 0 : _d.toLowerCase();
+        const caretBlinkAttribute = (_e = element.getAttribute("data-typecadence-caret-blink")) === null || _e === void 0 ? void 0 : _e.toLowerCase();
         const caretBlink = caretBlinkAttribute === "true" ? true :
             caretBlinkAttribute === "false" ? false :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretBlink;
-        const caretRemainAttribute = (_e = element.getAttribute("data-typecadence-caret-remain")) === null || _e === void 0 ? void 0 : _e.toLowerCase();
+        const caretRemainAttribute = (_f = element.getAttribute("data-typecadence-caret-remain")) === null || _f === void 0 ? void 0 : _f.toLowerCase();
         const caretRemain = caretRemainAttribute === "true" ? true :
             caretRemainAttribute === "false" ? false :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").caretRemain;
@@ -394,10 +514,13 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
         const mistakesPresentAttribute = parseInt(element.getAttribute("data-typecadence-mistakes-present"));
         const mistakesPresent = mistakesPresentAttribute < 0 || isNaN(mistakesPresentAttribute) ? __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").mistakesPresent : Math.max(1, mistakesPresentAttribute);
         const callback = element.getAttribute("data-typecadence-callback") || __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").callback;
-        const keyboardAttribute = (_f = element.getAttribute("data-typecadence-keyboard")) === null || _f === void 0 ? void 0 : _f.toLowerCase();
+        const keyboardAttribute = (_g = element.getAttribute("data-typecadence-keyboard")) === null || _g === void 0 ? void 0 : _g.toLowerCase();
         const keyboard = keyboardAttribute === KeyboardLayout.QWERTZ ? KeyboardLayout.QWERTZ :
             keyboardAttribute === KeyboardLayout.AZERTY ? KeyboardLayout.AZERTY :
                 __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").keyboard;
+        const triggerAttribute = (_h = element.getAttribute("data-typecadence-trigger")) === null || _h === void 0 ? void 0 : _h.toLowerCase();
+        const trigger = triggerAttribute === TriggerMode.MANUAL ? TriggerMode.MANUAL :
+            __classPrivateFieldGet(this, _Typecadence_defaultSettings, "f").trigger;
         const animationSettings = {
             debug,
             delay,
@@ -421,7 +544,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             callback,
             mistakes,
             mistakesPresent,
-            keyboard
+            keyboard,
+            trigger
         };
         if (debug)
             console.debug("Typecadence settings:", animationSettings);
@@ -482,7 +606,22 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
             }
             yield new Promise(resolve => setTimeout(resolve, __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, minSpeed, maxSpeed)));
         });
+    }, _Typecadence_waitIfPaused = function _Typecadence_waitIfPaused(element) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const state = __classPrivateFieldGet(this, _Typecadence_playbackState, "f").get(element);
+            if (state === null || state === void 0 ? void 0 : state.paused) {
+                yield new Promise(resolve => {
+                    state.resumeResolve = resolve;
+                });
+            }
+        });
     };
+    _Typecadence_instance = { value: null };
+    let TriggerMode;
+    (function (TriggerMode) {
+        TriggerMode["VISIBLE"] = "visible";
+        TriggerMode["MANUAL"] = "manual";
+    })(TriggerMode || (TriggerMode = {}));
     let KeyboardLayout;
     (function (KeyboardLayout) {
         KeyboardLayout["QWERTY"] = "qwerty";
