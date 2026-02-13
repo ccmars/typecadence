@@ -67,6 +67,7 @@ let intersectionCallback: (entries: Partial<IntersectionObserverEntry>[]) => voi
 beforeEach(() => {
   jest.useFakeTimers({ doNotFake: ['nextTick'] });
   document.body.innerHTML = '';
+  Typecadence._resetInstance();
 
   observeMock = jest.fn();
   unobserveMock = jest.fn();
@@ -172,7 +173,7 @@ describe('Basic typing', () => {
     const el = createElement('Hello', { 'data-typecadence-mistakes': '0' });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('Hello');
   });
@@ -181,7 +182,7 @@ describe('Basic typing', () => {
     const el = createElement('Hello', { 'data-typecadence-mistakes': '0' });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
     // Immediately after calling animateText, original text is cleared
     expect(el.textContent).not.toBe('Hello');
 
@@ -192,7 +193,7 @@ describe('Basic typing', () => {
     const el = createElement('', { 'data-typecadence-mistakes': '0' });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('');
   });
@@ -201,7 +202,7 @@ describe('Basic typing', () => {
     const el = createElement('A', { 'data-typecadence-mistakes': '0' });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('A');
   });
@@ -211,7 +212,7 @@ describe('Basic typing', () => {
     const el = createElement(longText, { 'data-typecadence-mistakes': '0' });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe(longText);
   });
@@ -226,7 +227,7 @@ describe('Caret behavior', () => {
     const el = createElement('Hi', { 'data-typecadence-mistakes': '0' });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
     const caret = el.querySelector('.typecadence-caret');
     expect(caret).not.toBeNull();
     expect(caret!.tagName).toBe('SPAN');
@@ -242,7 +243,7 @@ describe('Caret behavior', () => {
     });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
     const caret = el.querySelector('.typecadence-caret');
     expect(caret!.tagName).toBe('DIV');
 
@@ -256,7 +257,7 @@ describe('Caret behavior', () => {
     });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
     const caret = el.querySelector('.typecadence-caret');
     expect(caret!.classList.contains('my-caret')).toBe(true);
     expect(caret!.classList.contains('blinker')).toBe(true);
@@ -271,7 +272,7 @@ describe('Caret behavior', () => {
     });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
     const caret = el.querySelector('#my-caret-id');
     expect(caret).not.toBeNull();
 
@@ -285,7 +286,7 @@ describe('Caret behavior', () => {
     });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
     const caret = el.querySelector('.typecadence-caret');
     expect(caret!.textContent).toBe('_');
 
@@ -299,7 +300,7 @@ describe('Caret behavior', () => {
     });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
     const caret = el.querySelector('.typecadence-caret') as HTMLElement;
     expect(caret.style.color).toBe('red');
 
@@ -314,7 +315,7 @@ describe('Caret behavior', () => {
     });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
     const caret = el.querySelector('.typecadence-caret') as HTMLElement;
 
     expect(caret.style.visibility).toBe('visible');
@@ -335,7 +336,7 @@ describe('Caret behavior', () => {
     });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
     const caret = el.querySelector('.typecadence-caret');
     expect(caret).toBeNull();
 
@@ -346,7 +347,7 @@ describe('Caret behavior', () => {
     const el = createElement('Hi', { 'data-typecadence-mistakes': '0' });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     const caret = el.querySelector('.typecadence-caret') as HTMLElement;
     expect(caret.style.visibility).toBe('hidden');
@@ -361,7 +362,7 @@ describe('Caret behavior', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     const caret = el.querySelector('.typecadence-caret') as HTMLElement;
     // Blink interval should still be running after animation completes
@@ -378,7 +379,7 @@ describe('Caret behavior', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     const caret = el.querySelector('.typecadence-caret') as HTMLElement;
 
@@ -400,7 +401,7 @@ describe('Settings parsing', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('AB');
   });
@@ -413,7 +414,7 @@ describe('Settings parsing', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('AB');
   });
@@ -426,7 +427,7 @@ describe('Settings parsing', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('AB');
   });
@@ -439,7 +440,7 @@ describe('Settings parsing', () => {
     });
     const tc = new Typecadence();
 
-    const promise = tc.animateText(el);
+    const promise = Typecadence.play(el)!;
 
     // After 500ms (less than delay), nothing should be typed yet
     jest.advanceTimersByTime(500);
@@ -459,7 +460,7 @@ describe('Settings parsing', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('A B');
   });
@@ -480,7 +481,7 @@ describe('Settings parsing', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('AB');
   });
@@ -493,7 +494,7 @@ describe('Settings parsing', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('AB');
   });
@@ -507,7 +508,7 @@ describe('Settings parsing', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(debugSpy).toHaveBeenCalledWith(
       'Typecadence settings:',
@@ -528,7 +529,7 @@ describe('Mistake behavior', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('Hello');
   });
@@ -551,7 +552,7 @@ describe('Mistake behavior', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     // Final text should be correct after corrections
     expect(getVisibleText(el)).toBe('ab');
@@ -570,7 +571,7 @@ describe('Mistake behavior', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('abc');
   });
@@ -583,7 +584,7 @@ describe('Mistake behavior', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe('Hi');
   });
@@ -620,7 +621,7 @@ describe('Mistake behavior', () => {
     });
     observer.observe(el, { childList: true });
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
     observer.disconnect();
 
     // Adjacent to 'a' (qwerty): ['q','w','s','z'], index 0 → 'q' → uppercase → 'Q'
@@ -644,7 +645,7 @@ describe('Events & callbacks', () => {
     const handler = jest.fn();
     el.addEventListener('typecadence:complete', handler);
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(handler).toHaveBeenCalledTimes(1);
     expect((handler.mock.calls[0][0] as CustomEvent).detail).toEqual({ element: el });
@@ -660,7 +661,7 @@ describe('Events & callbacks', () => {
     const handler = jest.fn();
     document.body.addEventListener('typecadence:complete', handler);
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(handler).toHaveBeenCalledTimes(1);
     document.body.removeEventListener('typecadence:complete', handler);
@@ -677,7 +678,7 @@ describe('Events & callbacks', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(callbackFn).toHaveBeenCalledTimes(1);
     expect(callbackFn).toHaveBeenCalledWith(el);
@@ -693,7 +694,7 @@ describe('Events & callbacks', () => {
     });
     const tc = new Typecadence();
 
-    await expect(drainAnimation(tc.animateText(el))).resolves.toBeUndefined();
+    await expect(drainAnimation(Typecadence.play(el)!)).resolves.toBeUndefined();
   });
 });
 
@@ -1057,7 +1058,7 @@ describe('Edge cases', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe(text);
   });
@@ -1070,7 +1071,7 @@ describe('Edge cases', () => {
     });
     const tc = new Typecadence();
 
-    await drainAnimation(tc.animateText(el));
+    await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe(text);
   });
