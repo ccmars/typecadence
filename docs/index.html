@@ -193,6 +193,36 @@
       data-typecadence-caret-char='_'
       data-typecadence-mistakes='0'
       data-typecadence-caret-blink-speed='750'
+    >HTML Content</h2>
+
+    <div>
+      <h3>HTML: Preserved Tags</h3>
+      <div>
+        <p>
+          HTML tags inside a <code>typecadence</code> element are preserved throughout the animation. Characters are typed inside their respective elements, so inline formatting such as <code>&lt;b&gt;</code>, <code>&lt;em&gt;</code>, <code>&lt;span&gt;</code>, and <code>&lt;a&gt;</code> renders correctly as the text appears. Void elements such as <code>&lt;br&gt;</code> are inserted at the correct position with no delay.
+        </p>
+        <code>
+          &lt;span class="typecadence"&gt;Typecadence <b>&lt;b&gt;</b>preserves<b>&lt;/b&gt;</b> your <b>&lt;em&gt;</b>HTML<b>&lt;/em&gt;</b> &lt;span style="color: #cc2127"&gt;formatting&lt;/span&gt;.&lt;/span&gt;
+        </code>
+        <div class='typecadence'
+            id='demo-html'>
+          Typecadence <b>preserves</b> your <em>HTML</em> <span style='color: #cc2127'>formatting</span>.
+        </div>
+        <p><button onclick="Typecadence.restart('#demo-html')">Restart</button></p>
+      </div>
+    </div>
+  </main>
+</section>
+
+<section>
+  <main>
+    <h2 class='typecadence'
+      data-typecadence-speed='25'
+      data-typecadence-caret-remain='true'
+      data-typecadence-caret-color='#cc2127'
+      data-typecadence-caret-char='_'
+      data-typecadence-mistakes='0'
+      data-typecadence-caret-blink-speed='750'
     >Mistakes</h2>
     
     <div>

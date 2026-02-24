@@ -224,8 +224,8 @@ declare var define: any;
         // For manual trigger elements, hide text immediately and store it
         const triggerAttr = element.getAttribute("data-typecadence-trigger")?.toLowerCase();
         if (triggerAttr === TriggerMode.MANUAL) {
-          this.#storedText.set(element, element.textContent?.trim() || '');
-          element.textContent = '';
+          this.#storedText.set(element, element.innerHTML.trim());
+          element.innerHTML = '';
         }
         this.#observer.observe(element);
       }
@@ -317,7 +317,7 @@ declare var define: any;
         // Store original text for the next animation to pick up
         if (state.originalText !== undefined) {
           instance.#storedText.set(targetElement, state.originalText);
-          targetElement.textContent = '';
+          targetElement.innerHTML = '';
         }
         instance.#playbackState.delete(targetElement);
       }
@@ -481,11 +481,13 @@ declare var define: any;
       return desiredChar === desiredChar.toUpperCase() ? incorrectChar.toUpperCase() : incorrectChar;
     }
 
-    async #backspace(element: HTMLElement, caret: HTMLElement | null, minSpeed: number, maxSpeed: number): Promise<void> {
+    async #backspace(currentElement: HTMLElement, caret: HTMLElement | null, minSpeed: number, maxSpeed: number): Promise<void> {
       if (caret) {
-        element.removeChild(element.lastChild!.previousSibling!);
+        const n = caret.previousSibling;
+        if (n) currentElement.removeChild(n);
       } else {
-        element.textContent = element.textContent!.slice(0, -1);
+        const n = currentElement.lastChild;
+        if (n) currentElement.removeChild(n);
       }
       await new Promise(resolve => setTimeout(resolve, this.#getTypingSpeed(minSpeed, maxSpeed)));
     }
@@ -499,17 +501,44 @@ declare var define: any;
       }
     }
 
+    #parseHtmlToTokens(html: string): Token[] {
+      const scratch = document.createElement('div');
+      scratch.innerHTML = html;
+      const tokens: Token[] = [];
+      const VOID_TAGS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+
+      const walk = (node: Node): void => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          for (const char of (node.textContent ?? '')) {
+            tokens.push({ type: 'char', char });
+          }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as HTMLElement;
+          if (VOID_TAGS.has(el.tagName.toLowerCase())) {
+            tokens.push({ type: 'insert', el: el.cloneNode(false) as HTMLElement });
+          } else {
+            tokens.push({ type: 'open', el: el.cloneNode(false) as HTMLElement });
+            for (const child of Array.from(el.childNodes)) walk(child);
+            tokens.push({ type: 'close' });
+          }
+        }
+      };
+
+      for (const child of Array.from(scratch.childNodes)) walk(child);
+      return tokens;
+    }
+
     async #animateText(element: HTMLElement): Promise<void> {
       const animationSettings = this.#parseAnimationSettings(element);
 
-      // Define text content (use pre-stored text for manual trigger elements)
-      const text = this.#storedText.get(element) || element.textContent?.trim() || '';
+      // Define HTML content (use pre-stored content for manual trigger elements)
+      const html = (this.#storedText.get(element) || element.innerHTML).trim();
       this.#storedText.delete(element);
 
-      // Initialize playback state with original text
-      this.#playbackState.set(element, { paused: false, originalText: text });
+      // Initialize playback state with original HTML
+      this.#playbackState.set(element, { paused: false, originalText: html });
 
-      element.textContent = "";
+      element.innerHTML = '';
 
       let caret: HTMLElement | null = null;
       let caretAnimationInterval: number | null = null;
@@ -517,6 +546,9 @@ declare var define: any;
       // Show caret
       if (animationSettings.caret) {
         caret = this.#createCaret(animationSettings);
+        if (!animationSettings.caretColor) {
+          caret.style.color = getComputedStyle(element).color;
+        }
         element.appendChild(caret);
 
         if (animationSettings.caretBlink) {
@@ -538,13 +570,26 @@ declare var define: any;
       // Delay before typing
       await new Promise((resolve) => setTimeout(resolve, animationSettings.delay));
 
+      // Parse HTML into tokens and build charIndex→tokenIndex lookup
+      const tokens = this.#parseHtmlToTokens(html);
+      const charTokenIndices: number[] = [];
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].type === 'char') charTokenIndices.push(i);
+      }
+
       let mistakeBuffer: number[] = [];
-      let currentIndex = 0;
+      let tokenIndex = 0;
+      let charIndex = 0;
+      let currentElement: HTMLElement = element;
+      const elementStack: HTMLElement[] = [];
       let justCorrected = false;
+
+      const backspaceMin = animationSettings.backspaceMinSpeed ?? animationSettings.minSpeed;
+      const backspaceMax = animationSettings.backspaceMaxSpeed ?? animationSettings.maxSpeed;
 
       // Type animation
       const animationState = this.#playbackState.get(element);
-      while (currentIndex < text.length || mistakeBuffer.length > 0) {
+      while (tokenIndex < tokens.length || mistakeBuffer.length > 0) {
         // Check if cancelled (e.g., by restart)
         if (animationState?.cancelled) {
           if (caretAnimationInterval) clearInterval(caretAnimationInterval);
@@ -560,49 +605,69 @@ declare var define: any;
           return;
         }
 
-        // Correct mistakes
+        // Correct mistakes (buffer full or end of content)
         if (
           mistakeBuffer.length >= animationSettings.mistakesPresent
-          || (
-            mistakeBuffer.length > 0
-            && currentIndex >= text.length
-          )
+          || (mistakeBuffer.length > 0 && tokenIndex >= tokens.length)
         ) {
-          const mistakeIndex = mistakeBuffer[0];
-          const stepsToGoBack = currentIndex - mistakeIndex;
-
+          const stepsToGoBack = charIndex - mistakeBuffer[0];
           for (let i = 0; i < stepsToGoBack; i++) {
-            await this.#backspace(element, caret, animationSettings.backspaceMinSpeed ?? animationSettings.minSpeed, animationSettings.backspaceMaxSpeed ?? animationSettings.maxSpeed);
-            currentIndex--;
+            await this.#backspace(currentElement, caret, backspaceMin, backspaceMax);
+            charIndex--;
           }
-
+          tokenIndex = charTokenIndices[charIndex];
           mistakeBuffer = [];
           justCorrected = true;
+          continue;
+        }
+
+        const token = tokens[tokenIndex];
+
+        // Pre-boundary flush: correct mistakes before any structural token
+        if ((token.type === 'open' || token.type === 'close' || token.type === 'insert') && mistakeBuffer.length > 0) {
+          const stepsToGoBack = charIndex - mistakeBuffer[0];
+          for (let i = 0; i < stepsToGoBack; i++) {
+            await this.#backspace(currentElement, caret, backspaceMin, backspaceMax);
+            charIndex--;
+          }
+          tokenIndex = charTokenIndices[charIndex];
+          mistakeBuffer = [];
+          justCorrected = true;
+          continue;
+        }
+
+        // Process structural tokens (no typing delay)
+        if (token.type === 'open') {
+          if (caret) { currentElement.removeChild(caret); token.el.appendChild(caret); }
+          currentElement.appendChild(token.el);
+          elementStack.push(currentElement);
+          currentElement = token.el;
+          tokenIndex++;
+          continue;
+        }
+        if (token.type === 'close') {
+          const parent = elementStack.pop() ?? element;
+          if (caret) { currentElement.removeChild(caret); parent.appendChild(caret); }
+          currentElement = parent;
+          tokenIndex++;
+          continue;
+        }
+        if (token.type === 'insert') {
+          if (caret) currentElement.insertBefore(token.el, caret);
+          else currentElement.appendChild(token.el);
+          tokenIndex++;
+          continue;
         }
 
         // Type next character
-        const char = text[currentIndex];
+        const char = token.char;
         const isMistake = !justCorrected && this.#isMistake(animationSettings.mistakes);
         justCorrected = false;
-        if (isMistake) {
-          const incorrectChar = this.#incorrectChar(char, animationSettings.keyboard);
-          const charNode = document.createTextNode(incorrectChar);
-          if (caret) {
-            element.insertBefore(charNode, caret);
-          } else {
-            element.appendChild(charNode);
-          }
-          if (char !== incorrectChar) {
-            mistakeBuffer.push(currentIndex);
-          }
-        } else {
-          const charNode = document.createTextNode(char);
-          if (caret) {
-            element.insertBefore(charNode, caret);
-          } else {
-            element.appendChild(charNode);
-          }
-        }
+        const typedChar = isMistake ? this.#incorrectChar(char, animationSettings.keyboard) : char;
+        const charNode = document.createTextNode(typedChar);
+        if (caret) currentElement.insertBefore(charNode, caret);
+        else currentElement.appendChild(charNode);
+        if (isMistake && char !== typedChar) mistakeBuffer.push(charIndex);
 
         const isSpace = char === ' ';
         const typingMinSpeed = isSpace ? (animationSettings.spaceMinSpeed ?? animationSettings.minSpeed) : animationSettings.minSpeed;
@@ -610,7 +675,8 @@ declare var define: any;
         const typingSpeed = this.#getTypingSpeed(typingMinSpeed, typingMaxSpeed);
 
         await new Promise((resolve) => setTimeout(resolve, typingSpeed));
-        currentIndex++;
+        charIndex++;
+        tokenIndex++;
       }
 
       // Hide caret
@@ -654,6 +720,12 @@ declare var define: any;
       }
     }
   }
+
+  type Token =
+    | { type: 'char'; char: string }
+    | { type: 'open'; el: HTMLElement }
+    | { type: 'close' }
+    | { type: 'insert'; el: HTMLElement };
 
   interface AnimationSettings {
     debug: boolean;
