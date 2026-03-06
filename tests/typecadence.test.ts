@@ -55,6 +55,37 @@ function getVisibleText(el: HTMLElement): string {
   return text;
 }
 
+/** Recursively extract all visible text, ignoring the caret element. */
+function getVisibleTextDeep(el: HTMLElement): string {
+  let text = '';
+  for (const node of el.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      text += node.textContent;
+    } else if (
+      node.nodeType === Node.ELEMENT_NODE &&
+      !(node as HTMLElement).classList.contains('typecadence-caret')
+    ) {
+      text += getVisibleTextDeep(node as HTMLElement);
+    }
+  }
+  return text;
+}
+
+/** Create a `.typecadence` element with innerHTML and append to body. */
+function createHtmlElement(
+  html: string,
+  attributes: Record<string, string> = {},
+): HTMLElement {
+  const el = document.createElement('div');
+  el.classList.add('typecadence');
+  el.innerHTML = html;
+  for (const [key, value] of Object.entries(attributes)) {
+    el.setAttribute(key, value);
+  }
+  document.body.appendChild(el);
+  return el;
+}
+
 // ---------------------------------------------------------------------------
 // Mock setup
 // ---------------------------------------------------------------------------
@@ -1074,5 +1105,161 @@ describe('Edge cases', () => {
     await drainAnimation(Typecadence.play(el)!);
 
     expect(getVisibleText(el)).toBe(text);
+  });
+});
+
+// ===========================================================================
+// HTML tag preservation
+// ===========================================================================
+
+describe('HTML tag preservation', () => {
+  const noMistakesNoCaret = {
+    'data-typecadence-mistakes': '0',
+    'data-typecadence-caret': 'false',
+  };
+
+  test('single inline element: <b>Hello</b>', async () => {
+    const el = createHtmlElement('<b>Hello</b>', noMistakesNoCaret);
+    new Typecadence();
+
+    await drainAnimation(Typecadence.play(el)!);
+
+    const b = el.querySelector('b');
+    expect(b).not.toBeNull();
+    expect(b!.textContent).toBe('Hello');
+    expect(getVisibleTextDeep(el)).toBe('Hello');
+  });
+
+  test('mixed inline and plain text: <b>Hello</b> World', async () => {
+    const el = createHtmlElement('<b>Hello</b> World', noMistakesNoCaret);
+    new Typecadence();
+
+    await drainAnimation(Typecadence.play(el)!);
+
+    const b = el.querySelector('b');
+    expect(b).not.toBeNull();
+    expect(b!.textContent).toBe('Hello');
+    expect(getVisibleTextDeep(el)).toBe('Hello World');
+  });
+
+  test('nested elements: <b><i>Nested</i></b>', async () => {
+    const el = createHtmlElement('<b><i>Nested</i></b>', noMistakesNoCaret);
+    new Typecadence();
+
+    await drainAnimation(Typecadence.play(el)!);
+
+    const bi = el.querySelector('b > i');
+    expect(bi).not.toBeNull();
+    expect(bi!.textContent).toBe('Nested');
+  });
+
+  test('void element <br> is preserved', async () => {
+    const el = createHtmlElement('Line1<br>Line2', noMistakesNoCaret);
+    new Typecadence();
+
+    await drainAnimation(Typecadence.play(el)!);
+
+    expect(el.querySelector('br')).not.toBeNull();
+    expect(getVisibleTextDeep(el)).toBe('Line1Line2');
+  });
+
+  test('attribute is preserved: <a href="url">link</a>', async () => {
+    const el = createHtmlElement('<a href="https://example.com">link</a>', noMistakesNoCaret);
+    new Typecadence();
+
+    await drainAnimation(Typecadence.play(el)!);
+
+    const a = el.querySelector('a');
+    expect(a).not.toBeNull();
+    expect(a!.getAttribute('href')).toBe('https://example.com');
+    expect(a!.textContent).toBe('link');
+  });
+
+  test('class and style attributes preserved: <span class="x" style="color: red">text</span>', async () => {
+    const el = createHtmlElement('<span class="highlight" style="color: red">text</span>', noMistakesNoCaret);
+    new Typecadence();
+
+    await drainAnimation(Typecadence.play(el)!);
+
+    const span = el.querySelector('.highlight');
+    expect(span).not.toBeNull();
+    expect((span as HTMLElement).style.color).toBe('red');
+    expect(span!.textContent).toBe('text');
+  });
+
+  test('multiple sibling elements: <b>Bold</b> and <i>Italic</i>', async () => {
+    const el = createHtmlElement('<b>Bold</b> and <i>Italic</i>', noMistakesNoCaret);
+    new Typecadence();
+
+    await drainAnimation(Typecadence.play(el)!);
+
+    expect(el.querySelector('b')!.textContent).toBe('Bold');
+    expect(el.querySelector('i')!.textContent).toBe('Italic');
+    expect(getVisibleTextDeep(el)).toBe('Bold and Italic');
+  });
+
+  test('HTML structure is correct after mistake correction', async () => {
+    const el = createHtmlElement('<b>Hi</b>', {
+      'data-typecadence-mistakes': '100',
+      'data-typecadence-mistakes-present': '1',
+      'data-typecadence-caret': 'false',
+    });
+    new Typecadence();
+
+    await drainAnimation(Typecadence.play(el)!);
+
+    const b = el.querySelector('b');
+    expect(b).not.toBeNull();
+    expect(b!.textContent).toBe('Hi');
+    expect(getVisibleTextDeep(el)).toBe('Hi');
+  });
+
+  test('manual trigger stores and restores HTML', async () => {
+    const el = createHtmlElement('<em>Typed</em>', {
+      'data-typecadence-trigger': 'manual',
+      ...noMistakesNoCaret,
+    });
+    new Typecadence();
+
+    expect(el.innerHTML).toBe('');
+
+    await drainAnimation(Typecadence.play(el)!);
+
+    const em = el.querySelector('em');
+    expect(em).not.toBeNull();
+    expect(em!.textContent).toBe('Typed');
+  });
+
+  test('restart preserves HTML structure', async () => {
+    const el = createHtmlElement('<b>Hi</b>', {
+      'data-typecadence-trigger': 'manual',
+      ...noMistakesNoCaret,
+    });
+    new Typecadence();
+
+    await drainAnimation(Typecadence.play(el)!);
+    expect(el.querySelector('b')!.textContent).toBe('Hi');
+
+    await drainAnimation(Typecadence.restart(el)!);
+    expect(el.querySelector('b')!.textContent).toBe('Hi');
+  });
+
+  test('caret color is pinned to root element color, not inherited from nested span', async () => {
+    const el = createHtmlElement('<span style="color: rgb(255, 0, 0)">Hello</span>', {
+      'data-typecadence-mistakes': '0',
+    });
+    el.style.color = 'rgb(0, 128, 0)';
+    new Typecadence();
+
+    const promise = Typecadence.play(el)!;
+
+    jest.advanceTimersByTime(1);
+    await new Promise<void>(r => process.nextTick(r));
+
+    const caretEl = el.querySelector('.typecadence-caret') as HTMLElement;
+    expect(caretEl).not.toBeNull();
+    expect(caretEl.style.color).toBe('rgb(0, 128, 0)');
+
+    await drainAnimation(promise);
   });
 });

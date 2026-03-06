@@ -30,7 +30,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     }
 }(this, function () {
     'use strict';
-    var _Typecadence_instances, _a, _Typecadence_instance, _Typecadence_elements, _Typecadence_playbackState, _Typecadence_storedText, _Typecadence_defaultSettings, _Typecadence_adjacentMapping, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseAnimationSettings, _Typecadence_parseSpeedAttribute, _Typecadence_parsePercent, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_isMistake, _Typecadence_incorrectChar, _Typecadence_backspace, _Typecadence_waitIfPaused, _Typecadence_animateText;
+    var _Typecadence_instances, _a, _Typecadence_instance, _Typecadence_elements, _Typecadence_playbackState, _Typecadence_storedText, _Typecadence_defaultSettings, _Typecadence_adjacentMapping, _Typecadence_observer, _Typecadence_handleIntersect, _Typecadence_parseAnimationSettings, _Typecadence_parseSpeedAttribute, _Typecadence_parsePercent, _Typecadence_getTypingSpeed, _Typecadence_createCaret, _Typecadence_isMistake, _Typecadence_incorrectChar, _Typecadence_backspace, _Typecadence_waitIfPaused, _Typecadence_parseHtmlToTokens, _Typecadence_animateText;
     class Typecadence {
         constructor() {
             _Typecadence_instances.add(this);
@@ -236,13 +236,13 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
             __classPrivateFieldSet(_a, _a, null, "f", _Typecadence_instance);
         }
         init() {
-            var _b, _c;
+            var _b;
             for (const element of __classPrivateFieldGet(this, _Typecadence_elements, "f")) {
                 // For manual trigger elements, hide text immediately and store it
                 const triggerAttr = (_b = element.getAttribute("data-typecadence-trigger")) === null || _b === void 0 ? void 0 : _b.toLowerCase();
                 if (triggerAttr === TriggerMode.MANUAL) {
-                    __classPrivateFieldGet(this, _Typecadence_storedText, "f").set(element, ((_c = element.textContent) === null || _c === void 0 ? void 0 : _c.trim()) || '');
-                    element.textContent = '';
+                    __classPrivateFieldGet(this, _Typecadence_storedText, "f").set(element, element.innerHTML.trim());
+                    element.innerHTML = '';
                 }
                 __classPrivateFieldGet(this, _Typecadence_observer, "f").observe(element);
             }
@@ -320,7 +320,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
                 // Store original text for the next animation to pick up
                 if (state.originalText !== undefined) {
                     __classPrivateFieldGet(instance, _Typecadence_storedText, "f").set(targetElement, state.originalText);
-                    targetElement.textContent = '';
+                    targetElement.innerHTML = '';
                 }
                 __classPrivateFieldGet(instance, _Typecadence_playbackState, "f").delete(targetElement);
             }
@@ -466,13 +466,17 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
         const randomIndex = Math.floor(Math.random() * adjacentChars.length);
         const incorrectChar = adjacentChars[randomIndex];
         return desiredChar === desiredChar.toUpperCase() ? incorrectChar.toUpperCase() : incorrectChar;
-    }, _Typecadence_backspace = function _Typecadence_backspace(element, caret, minSpeed, maxSpeed) {
+    }, _Typecadence_backspace = function _Typecadence_backspace(currentElement, caret, minSpeed, maxSpeed) {
         return __awaiter(this, void 0, void 0, function* () {
             if (caret) {
-                element.removeChild(element.lastChild.previousSibling);
+                const n = caret.previousSibling;
+                if (n)
+                    currentElement.removeChild(n);
             }
             else {
-                element.textContent = element.textContent.slice(0, -1);
+                const n = currentElement.lastChild;
+                if (n)
+                    currentElement.removeChild(n);
             }
             yield new Promise(resolve => setTimeout(resolve, __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, minSpeed, maxSpeed)));
         });
@@ -485,21 +489,52 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
                 });
             }
         });
+    }, _Typecadence_parseHtmlToTokens = function _Typecadence_parseHtmlToTokens(html) {
+        const scratch = document.createElement('div');
+        scratch.innerHTML = html;
+        const tokens = [];
+        const VOID_TAGS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+        const walk = (node) => {
+            var _b;
+            if (node.nodeType === Node.TEXT_NODE) {
+                for (const char of ((_b = node.textContent) !== null && _b !== void 0 ? _b : '')) {
+                    tokens.push({ type: 'char', char });
+                }
+            }
+            else if (node.nodeType === Node.ELEMENT_NODE) {
+                const el = node;
+                if (VOID_TAGS.has(el.tagName.toLowerCase())) {
+                    tokens.push({ type: 'insert', el: el.cloneNode(false) });
+                }
+                else {
+                    tokens.push({ type: 'open', el: el.cloneNode(false) });
+                    for (const child of Array.from(el.childNodes))
+                        walk(child);
+                    tokens.push({ type: 'close' });
+                }
+            }
+        };
+        for (const child of Array.from(scratch.childNodes))
+            walk(child);
+        return tokens;
     }, _Typecadence_animateText = function _Typecadence_animateText(element) {
         return __awaiter(this, void 0, void 0, function* () {
             var _b, _c, _d, _e, _f, _g;
             const animationSettings = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseAnimationSettings).call(this, element);
-            // Define text content (use pre-stored text for manual trigger elements)
-            const text = __classPrivateFieldGet(this, _Typecadence_storedText, "f").get(element) || ((_b = element.textContent) === null || _b === void 0 ? void 0 : _b.trim()) || '';
+            // Define HTML content (use pre-stored content for manual trigger elements)
+            const html = (__classPrivateFieldGet(this, _Typecadence_storedText, "f").get(element) || element.innerHTML).trim();
             __classPrivateFieldGet(this, _Typecadence_storedText, "f").delete(element);
-            // Initialize playback state with original text
-            __classPrivateFieldGet(this, _Typecadence_playbackState, "f").set(element, { paused: false, originalText: text });
-            element.textContent = "";
+            // Initialize playback state with original HTML
+            __classPrivateFieldGet(this, _Typecadence_playbackState, "f").set(element, { paused: false, originalText: html });
+            element.innerHTML = '';
             let caret = null;
             let caretAnimationInterval = null;
             // Show caret
             if (animationSettings.caret) {
                 caret = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_createCaret).call(this, animationSettings);
+                if (!animationSettings.caretColor) {
+                    caret.style.color = getComputedStyle(element).color;
+                }
                 element.appendChild(caret);
                 if (animationSettings.caretBlink) {
                     // @ts-ignore - browser setInterval returns number
@@ -519,12 +554,24 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
             }
             // Delay before typing
             yield new Promise((resolve) => setTimeout(resolve, animationSettings.delay));
+            // Parse HTML into tokens and build charIndex→tokenIndex lookup
+            const tokens = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_parseHtmlToTokens).call(this, html);
+            const charTokenIndices = [];
+            for (let i = 0; i < tokens.length; i++) {
+                if (tokens[i].type === 'char')
+                    charTokenIndices.push(i);
+            }
             let mistakeBuffer = [];
-            let currentIndex = 0;
+            let tokenIndex = 0;
+            let charIndex = 0;
+            let currentElement = element;
+            const elementStack = [];
             let justCorrected = false;
+            const backspaceMin = (_b = animationSettings.backspaceMinSpeed) !== null && _b !== void 0 ? _b : animationSettings.minSpeed;
+            const backspaceMax = (_c = animationSettings.backspaceMaxSpeed) !== null && _c !== void 0 ? _c : animationSettings.maxSpeed;
             // Type animation
             const animationState = __classPrivateFieldGet(this, _Typecadence_playbackState, "f").get(element);
-            while (currentIndex < text.length || mistakeBuffer.length > 0) {
+            while (tokenIndex < tokens.length || mistakeBuffer.length > 0) {
                 // Check if cancelled (e.g., by restart)
                 if (animationState === null || animationState === void 0 ? void 0 : animationState.cancelled) {
                     if (caretAnimationInterval)
@@ -539,51 +586,83 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
                         clearInterval(caretAnimationInterval);
                     return;
                 }
-                // Correct mistakes
+                // Correct mistakes (buffer full or end of content)
                 if (mistakeBuffer.length >= animationSettings.mistakesPresent
-                    || (mistakeBuffer.length > 0
-                        && currentIndex >= text.length)) {
-                    const mistakeIndex = mistakeBuffer[0];
-                    const stepsToGoBack = currentIndex - mistakeIndex;
+                    || (mistakeBuffer.length > 0 && tokenIndex >= tokens.length)) {
+                    const stepsToGoBack = charIndex - mistakeBuffer[0];
                     for (let i = 0; i < stepsToGoBack; i++) {
-                        yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, element, caret, (_c = animationSettings.backspaceMinSpeed) !== null && _c !== void 0 ? _c : animationSettings.minSpeed, (_d = animationSettings.backspaceMaxSpeed) !== null && _d !== void 0 ? _d : animationSettings.maxSpeed);
-                        currentIndex--;
+                        yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, currentElement, caret, backspaceMin, backspaceMax);
+                        charIndex--;
                     }
+                    tokenIndex = charTokenIndices[charIndex];
                     mistakeBuffer = [];
                     justCorrected = true;
+                    continue;
+                }
+                const token = tokens[tokenIndex];
+                // Pre-boundary flush: correct mistakes before any structural token
+                if ((token.type === 'open' || token.type === 'close' || token.type === 'insert') && mistakeBuffer.length > 0) {
+                    const stepsToGoBack = charIndex - mistakeBuffer[0];
+                    for (let i = 0; i < stepsToGoBack; i++) {
+                        yield __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_backspace).call(this, currentElement, caret, backspaceMin, backspaceMax);
+                        charIndex--;
+                    }
+                    tokenIndex = charTokenIndices[charIndex];
+                    mistakeBuffer = [];
+                    justCorrected = true;
+                    continue;
+                }
+                // Process structural tokens (no typing delay)
+                if (token.type === 'open') {
+                    if (caret) {
+                        currentElement.removeChild(caret);
+                        token.el.appendChild(caret);
+                    }
+                    currentElement.appendChild(token.el);
+                    elementStack.push(currentElement);
+                    currentElement = token.el;
+                    tokenIndex++;
+                    continue;
+                }
+                if (token.type === 'close') {
+                    // Falls back to root element if stack is empty (shouldn't happen —
+                    // browser HTML parser guarantees balanced open/close tokens)
+                    const parent = (_d = elementStack.pop()) !== null && _d !== void 0 ? _d : element;
+                    if (caret) {
+                        currentElement.removeChild(caret);
+                        parent.appendChild(caret);
+                    }
+                    currentElement = parent;
+                    tokenIndex++;
+                    continue;
+                }
+                if (token.type === 'insert') {
+                    if (caret)
+                        currentElement.insertBefore(token.el, caret);
+                    else
+                        currentElement.appendChild(token.el);
+                    tokenIndex++;
+                    continue;
                 }
                 // Type next character
-                const char = text[currentIndex];
+                const char = token.char;
                 const isMistake = !justCorrected && __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_isMistake).call(this, animationSettings.mistakes);
                 justCorrected = false;
-                if (isMistake) {
-                    const incorrectChar = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_incorrectChar).call(this, char, animationSettings.keyboard);
-                    const charNode = document.createTextNode(incorrectChar);
-                    if (caret) {
-                        element.insertBefore(charNode, caret);
-                    }
-                    else {
-                        element.appendChild(charNode);
-                    }
-                    if (char !== incorrectChar) {
-                        mistakeBuffer.push(currentIndex);
-                    }
-                }
-                else {
-                    const charNode = document.createTextNode(char);
-                    if (caret) {
-                        element.insertBefore(charNode, caret);
-                    }
-                    else {
-                        element.appendChild(charNode);
-                    }
-                }
+                const typedChar = isMistake ? __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_incorrectChar).call(this, char, animationSettings.keyboard) : char;
+                const charNode = document.createTextNode(typedChar);
+                if (caret)
+                    currentElement.insertBefore(charNode, caret);
+                else
+                    currentElement.appendChild(charNode);
+                if (isMistake && char !== typedChar)
+                    mistakeBuffer.push(charIndex);
                 const isSpace = char === ' ';
                 const typingMinSpeed = isSpace ? ((_e = animationSettings.spaceMinSpeed) !== null && _e !== void 0 ? _e : animationSettings.minSpeed) : animationSettings.minSpeed;
                 const typingMaxSpeed = isSpace ? ((_f = animationSettings.spaceMaxSpeed) !== null && _f !== void 0 ? _f : animationSettings.maxSpeed) : animationSettings.maxSpeed;
                 const typingSpeed = __classPrivateFieldGet(this, _Typecadence_instances, "m", _Typecadence_getTypingSpeed).call(this, typingMinSpeed, typingMaxSpeed);
                 yield new Promise((resolve) => setTimeout(resolve, typingSpeed));
-                currentIndex++;
+                charIndex++;
+                tokenIndex++;
             }
             // Hide caret
             if (animationSettings.caret) {
