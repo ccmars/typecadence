@@ -12,6 +12,12 @@ declare var define: any;
 }(this, function () {
   'use strict';
 
+  type Token =
+    | { type: 'char'; char: string }
+    | { type: 'open'; el: HTMLElement }
+    | { type: 'close' }
+    | { type: 'insert'; el: HTMLElement };
+
   class Typecadence {
     static #instance: Typecadence | null = null;
     readonly #elements: NodeListOf<HTMLElement>;
@@ -481,6 +487,9 @@ declare var define: any;
       return desiredChar === desiredChar.toUpperCase() ? incorrectChar.toUpperCase() : incorrectChar;
     }
 
+    // NOTE: backspace assumes it only operates within a single DOM parent.
+    // The pre-boundary flush in #animateText guarantees mistakes are corrected
+    // before any open/close/insert token, keeping corrections in one element.
     async #backspace(currentElement: HTMLElement, caret: HTMLElement | null, minSpeed: number, maxSpeed: number): Promise<void> {
       if (caret) {
         const n = caret.previousSibling;
@@ -646,6 +655,8 @@ declare var define: any;
           continue;
         }
         if (token.type === 'close') {
+          // Falls back to root element if stack is empty (shouldn't happen —
+          // browser HTML parser guarantees balanced open/close tokens)
           const parent = elementStack.pop() ?? element;
           if (caret) { currentElement.removeChild(caret); parent.appendChild(caret); }
           currentElement = parent;
@@ -720,12 +731,6 @@ declare var define: any;
       }
     }
   }
-
-  type Token =
-    | { type: 'char'; char: string }
-    | { type: 'open'; el: HTMLElement }
-    | { type: 'close' }
-    | { type: 'insert'; el: HTMLElement };
 
   interface AnimationSettings {
     debug: boolean;

@@ -625,6 +625,8 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
                     continue;
                 }
                 if (token.type === 'close') {
+                    // Falls back to root element if stack is empty (shouldn't happen —
+                    // browser HTML parser guarantees balanced open/close tokens)
                     const parent = (_d = elementStack.pop()) !== null && _d !== void 0 ? _d : element;
                     if (caret) {
                         currentElement.removeChild(caret);
