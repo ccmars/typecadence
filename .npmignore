@@ -3,6 +3,11 @@ node_modules
 .idea
 .vscode
 .claude
+.codex
+.gemini
+CLAUDE.md
+AGENTS.md
+GEMINI.md
 src
 docs
 tests
