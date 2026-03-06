@@ -8,7 +8,10 @@ node_modules/
 # Test coverage
 coverage/
 
-# Claude Code
+# AI agents
 .claude/
+.codex/
+.gemini/
 CLAUDE.md
 AGENTS.md
+GEMINI.md
